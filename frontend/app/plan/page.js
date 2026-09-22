@@ -108,7 +108,7 @@ function PlanInner() {
         ) : (
           <>
             {placement && (
-              <div className="rounded-[14px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[14px] flex flex-col md:flex-row md:items-center justify-between gap-[12px]">
+              <div className="rounded-[14px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 p-[18px] shadow-[var(--shadow-md)] flex flex-col md:flex-row md:items-center justify-between gap-[12px]">
                 <div>
                   <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">
                     Placed at {placement.band} (mock) — working toward {placement.next}.
