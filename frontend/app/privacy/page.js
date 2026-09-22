@@ -66,22 +66,30 @@ export default function PrivacyPage() {
       <main className="mx-auto w-full max-w-[720px] px-[20px] md:px-[24px] py-[20px] md:py-[28px] flex flex-col gap-[18px]">
         <div>
           <PillBadge>Privacy · plain language</PillBadge>
-          <h1 className="mt-[12px] text-[28px] md:text-[36px] font-medium leading-[0.95] tracking-[-0.02em] text-[var(--color-forest-ink)]">
+          <h1 className="mt-[12px] text-[36px] md:text-[47px] font-medium leading-[1] tracking-[-0.02em] md:tracking-[-1.13px] text-[var(--color-forest-ink)]">
             What we keep, and why.
           </h1>
-          <p className="mt-[8px] text-[14px] leading-[1.5] text-[var(--color-lichen-gray)]">
-            Short version: your plan to run your classes, your voice to teach you, nothing to track you. Last updated September 2026.
+          <p className="mt-[8px] text-[14px] md:text-[16px] leading-[1.5] text-[var(--color-lichen-gray)]">
+            Short version: your plan to run your classes, your voice to teach you, nothing to track you.
+          </p>
+          <p className="mt-[8px] text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">
+            Last updated September 2026 · 3 min read · not legal advice
           </p>
         </div>
 
-        <div className="flex flex-col gap-[8px]">
-          {SECTIONS.map((s) => (
+        <div className="flex flex-col gap-[12px]">
+          {SECTIONS.map((s, i) => (
             <div
               key={s.title}
-              className="rounded-[14px] bg-white p-[18px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)]"
+              className="rounded-[14px] bg-white p-[18px] md:p-[22px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)]"
             >
-              <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">{s.title}</p>
-              <p className="mt-[8px] text-[14px] leading-[1.5] text-[var(--color-forest-ink)]">{s.body}</p>
+              <div className="flex items-baseline gap-[10px]">
+                <span className="text-[13px] font-medium tabular-nums text-[var(--color-mist)]">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h2 className="text-[19px] font-medium leading-[1.2] text-[var(--color-forest-ink)]">{s.title}</h2>
+              </div>
+              <p className="mt-[8px] text-[14px] leading-[1.5] text-[var(--color-lichen-gray)]">{s.body}</p>
             </div>
           ))}
         </div>
