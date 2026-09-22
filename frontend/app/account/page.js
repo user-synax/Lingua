@@ -200,6 +200,9 @@ function AccountInner() {
                     )}
                   </div>
                   {onboarding.completed && <span className="inline-flex w-fit rounded-full bg-[var(--color-forest-ink)] px-[10px] py-[5px] text-[11px] font-medium text-white">Completed ✓</span>}
+                  <a href="/plan" className="mt-[4px] inline-flex w-fit text-[12px] font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
+                    See reality check →
+                  </a>
                 </div>
               )}
             </div>
