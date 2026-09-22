@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { LinguaLogo } from "@/components/ui/Logo";
 import { PillBadge } from "@/components/ui/Badge";
+import { useAuth } from "@/context/AuthContext";
+import { api } from "@/lib/api";
 
 const LANGUAGES = [
   { code: "de", name: "German", native: "Deutsch", flag: "🇩🇪", level: "A1 → B2" },
@@ -36,21 +38,16 @@ const SLOTS = [
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const [step, setStep] = useState(1);
   const total = 3;
 
-  // Step 1
   const [target, setTarget] = useState("de");
   const [nativeLang, setNativeLang] = useState("English");
-
-  // Step 2
   const [goal, setGoal] = useState("career");
   const [deadline, setDeadline] = useState("");
   const [hours, setHours] = useState(6);
-
-  // Step 3
   const [avail, setAvail] = useState(() => {
-    // default: Mon/Wed eve + Sat morn
     const m = {};
     m["Mon-eve"] = true;
     m["Wed-eve"] = true;
@@ -59,6 +56,41 @@ export default function OnboardingPage() {
   });
   const [tz, setTz] = useState("Asia/Kolkata");
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Auth guard
+  useEffect(() => {
+    if (!loading && !user) router.replace("/login?next=/onboarding");
+  }, [loading, user, router]);
+
+  // Load existing onboarding
+  useEffect(() => {
+    if (!user) return;
+    api
+      .getOnboarding()
+      .then((data) => {
+        const o = data.onboarding || data.user?.onboarding || {};
+        if (o.target) setTarget(o.target);
+        if (o.nativeLang) setNativeLang(o.nativeLang);
+        if (o.goal) setGoal(o.goal);
+        if (o.deadline) setDeadline(o.deadline ? new Date(o.deadline).toISOString().slice(0, 10) : "");
+        if (o.hours) setHours(o.hours);
+        if (o.timezone) setTz(o.timezone);
+        if (o.availability) {
+          // backend returns Map-converted object
+          const av = o.availability;
+          const isEmpty = !av || Object.keys(av).length === 0;
+          if (!isEmpty) setAvail(av);
+        }
+        if (o.completed) {
+          // already done — keep in step view but show indicator
+        }
+      })
+      .catch(() => {})
+      .finally(() => setInitialLoading(false));
+  }, [user]);
 
   const toggleAvail = (d, s) => {
     const k = `${d}-${s}`;
@@ -74,7 +106,8 @@ export default function OnboardingPage() {
     return false;
   }
 
-  function next() {
+  async function next() {
+    setServerError("");
     const e = {};
     if (step === 1) {
       if (!target) e.target = "Pick a language";
@@ -88,23 +121,61 @@ export default function OnboardingPage() {
     }
     setErrors(e);
     if (Object.keys(e).length) return;
-    if (step < total) setStep((s) => s + 1);
-    else {
-      // pure UI finish — go home or to dashboard placeholder
-      router.push("/?onboarded=1");
+    if (step < total) {
+      // persist partial progress quietly
+      try {
+        await api.saveOnboarding({
+          target,
+          nativeLang,
+          goal,
+          deadline: deadline || null,
+          hours,
+          availability: avail,
+          timezone: tz,
+        });
+      } catch {}
+      setStep((s) => s + 1);
+    } else {
+      setSaving(true);
+      try {
+        await api.saveOnboarding({
+          target,
+          nativeLang,
+          goal,
+          deadline: deadline || null,
+          hours,
+          availability: avail,
+          timezone: tz,
+          completed: true,
+        });
+        router.push("/account?onboarded=1");
+      } catch (err) {
+        setServerError(err.data?.error || err.message || "Failed to save — check backend");
+      } finally {
+        setSaving(false);
+      }
     }
   }
 
   function back() {
     if (step > 1) setStep((s) => s - 1);
-    else router.push("/signup");
+    else router.push("/account");
   }
 
   const pct = Math.round((step / total) * 100);
 
+  if (loading || initialLoading) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-[var(--color-parchment)]">
+        <p className="text-[14px] text-[var(--color-lichen-gray)]">Loading…</p>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-parchment)]">
-      {/* Top bar */}
       <header className="sticky top-0 z-20 border-b border-[var(--color-forest-ink)]/10 bg-[var(--color-parchment)]/85 backdrop-blur">
         <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px] gap-[16px]">
           <LinguaLogo />
@@ -114,22 +185,20 @@ export default function OnboardingPage() {
             <span className="font-medium text-[var(--color-forest-ink)]">
               Step {step} of {total}
             </span>
+            <span className="hidden lg:inline text-[12px] text-[var(--color-mist)]">· {user.email}</span>
           </div>
-          <a href="/login" className="text-[13px] font-medium text-[var(--color-lichen-gray)] hover:text-[var(--color-forest-ink)]">
+          <a href="/account" className="text-[13px] font-medium text-[var(--color-lichen-gray)] hover:text-[var(--color-forest-ink)]">
             Save & exit
           </a>
         </div>
-        {/* Progress */}
         <div className="h-[3px] w-full bg-[var(--color-forest-ink)]/8">
           <div className="h-full bg-[var(--color-forest-ink)] transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
       </header>
 
       <div className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col lg:flex-row">
-        {/* Sidebar — pastel feature cards system */}
         <aside className="w-full lg:w-[380px] shrink-0 border-b lg:border-b-0 lg:border-r border-[var(--color-forest-ink)]/10 p-[20px] md:p-[24px] lg:sticky lg:top-[67px] lg:h-[calc(100vh-67px)] lg:overflow-auto">
           <div className="flex flex-col gap-[20px]">
-            {/* Section header rhythm: badge → heading → description */}
             <div>
               <PillBadge withArrow>Setup · {pct}%</PillBadge>
               <h1 className="mt-[14px] text-[32px] font-medium leading-[0.95] tracking-[-0.02em] text-[var(--color-forest-ink)]">
@@ -144,7 +213,6 @@ export default function OnboardingPage() {
               </p>
             </div>
 
-            {/* Step tracker */}
             <div className="flex gap-[8px]">
               {[1, 2, 3].map((n) => (
                 <div key={n} className="flex flex-1 flex-col gap-[6px]">
@@ -156,7 +224,6 @@ export default function OnboardingPage() {
               ))}
             </div>
 
-            {/* Pastel cards — taxonomy */}
             <div className="grid gap-[12px]">
               <div className={`rounded-[14px] p-[16px] border border-[var(--color-forest-ink)]/5 ${step === 1 ? "bg-[var(--color-mint-surface)]" : "bg-white"}`}>
                 <p className="inline-flex h-[28px] w-[28px] items-center justify-center rounded-full bg-white border border-[var(--color-forest-ink)]/10 text-[12px]">◐</p>
@@ -195,7 +262,6 @@ export default function OnboardingPage() {
                 )}
               </div>
 
-              {/* Reality check teaser — PRD ON-3 */}
               <div className="rounded-[14px] bg-[var(--color-buttercream)] border border-[var(--color-forest-ink)]/10 p-[16px]">
                 <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">Reality check</p>
                 <p className="mt-[6px] text-[13px] leading-[1.5] text-[var(--color-forest-ink)]">
@@ -210,10 +276,14 @@ export default function OnboardingPage() {
           </div>
         </aside>
 
-        {/* Main form */}
         <main className="flex-1 p-[20px] md:p-[32px] lg:p-[40px]">
           <div className="mx-auto max-w-[640px]">
-            {/* Step 1 */}
+            {serverError && (
+              <div className="mb-[16px] rounded-[12px] bg-red-50 border border-red-200 px-[14px] py-[12px] text-[13px] text-red-700">
+                {serverError}
+              </div>
+            )}
+
             {step === 1 && (
               <div className="flex flex-col gap-[24px]">
                 <div className="rounded-[14px] bg-white p-[22px] md:p-[28px] shadow-[var(--shadow-md)] border border-[var(--color-forest-ink)]/[0.06]">
@@ -260,17 +330,9 @@ export default function OnboardingPage() {
                     ))}
                   </div>
                 </div>
-
-                <div className="rounded-[12px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[12px]">
-                  <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Why two languages?</p>
-                  <p className="mt-[4px] text-[12px] leading-[1.5] text-[var(--color-lichen-gray)]">
-                    Target-language share adapts by level (A1 ~55%, B2 95%). Own-language help is always one tap away — never guessed.
-                  </p>
-                </div>
               </div>
             )}
 
-            {/* Step 2 */}
             {step === 2 && (
               <div className="flex flex-col gap-[24px]">
                 <div className="rounded-[14px] bg-white p-[22px] md:p-[28px] shadow-[var(--shadow-md)] border border-[var(--color-forest-ink)]/[0.06]">
@@ -323,27 +385,16 @@ export default function OnboardingPage() {
                         {hours < 4 ? "Light" : hours < 7 ? "Steady" : "Intensive"}
                       </span>
                     </div>
-                    <input
-                      type="range"
-                      min={3}
-                      max={15}
-                      value={hours}
-                      onChange={(e) => setHours(parseInt(e.target.value))}
-                      className="mt-[14px] w-full accent-[var(--color-forest-ink)]"
-                    />
+                    <input type="range" min={3} max={15} value={hours} onChange={(e) => setHours(parseInt(e.target.value))} className="mt-[14px] w-full accent-[var(--color-forest-ink)]" />
                     <div className="mt-[6px] flex justify-between text-[11px] text-[var(--color-mist)]">
                       <span>3h</span>
                       <span>15h</span>
                     </div>
-                    <p className="mt-[10px] rounded-[10px] bg-[var(--color-parchment)] px-[10px] py-[8px] text-[11px] leading-[1.4] text-[var(--color-lichen-gray)]">
-                      {hours < 4 ? "Good for maintenance, not fast moves. Expect ~6+ months per CEFR level." : hours < 7 ? "The beta sweet spot — 2 classes + review. Most learners choose this." : "Fast lane: 3–4 classes/week + homework. Needs calendar discipline."}
-                    </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Step 3 */}
             {step === 3 && (
               <div className="flex flex-col gap-[24px]">
                 <div className="rounded-[14px] bg-white p-[22px] md:p-[28px] shadow-[var(--shadow-md)] border border-[var(--color-forest-ink)]/[0.06]">
@@ -357,7 +408,9 @@ export default function OnboardingPage() {
                       <div className="grid grid-cols-[72px_repeat(7,1fr)] gap-[6px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">
                         <span />
                         {DAYS.map((d) => (
-                          <span key={d} className="text-center py-[4px]">{d}</span>
+                          <span key={d} className="text-center py-[4px]">
+                            {d}
+                          </span>
                         ))}
                       </div>
                       {SLOTS.map((slot) => (
@@ -409,10 +462,6 @@ export default function OnboardingPage() {
                       <option value="Asia/Tokyo">Asia/Tokyo — JST (UTC+09:00)</option>
                       <option value="Europe/Lisbon">Europe/Lisbon — WET (UTC+00:00)</option>
                     </select>
-                    <label className="mt-[12px] flex gap-[8px] text-[12px] leading-[1.4] text-[var(--color-lichen-gray)]">
-                      <input type="checkbox" defaultChecked className="mt-[2px] accent-[var(--color-forest-ink)]" />
-                      <span>Send calendar invites (.ics + Google) and reminders 24h / 1h / 10 min before class. No guilt copy.</span>
-                    </label>
                   </div>
 
                   <div className="rounded-[14px] bg-[var(--color-lavender-surface)] p-[16px] border border-[var(--color-forest-ink)]/10">
@@ -428,33 +477,25 @@ export default function OnboardingPage() {
                         <p className="mt-[4px] text-[14px] font-medium text-[var(--color-forest-ink)]">Sat · 10:00–10:15 · Review</p>
                         <p className="text-[12px] text-[var(--color-lichen-gray)]">Spaced deck from your errors + homework</p>
                       </div>
-                      <p className="text-[11px] leading-[1.4] text-[var(--color-lichen-gray)]">
-                        Total {hours}h: 2h live + {(hours - 2).toFixed(1)}h async. Miss a class? Recording + notes, re-plan in 2 clicks.
-                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Nav */}
             <div className="mt-[28px] flex items-center justify-between gap-[12px] border-t border-[var(--color-forest-ink)]/10 pt-[20px]">
-              <Button variant="outlined" onClick={back}>
+              <Button variant="outlined" onClick={back} disabled={saving}>
                 ← Back
               </Button>
               <div className="flex items-center gap-[10px]">
                 <span className="hidden md:inline text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">
                   {step} / {total} · {pct}%
                 </span>
-                <Button variant="filled" onClick={next} disabled={!canContinue()}>
-                  {step < total ? "Continue →" : "Confirm timetable →"}
+                <Button variant="filled" onClick={next} disabled={!canContinue() || saving}>
+                  {saving ? "Saving…" : step < total ? "Continue →" : "Confirm timetable →"}
                 </Button>
               </div>
             </div>
-
-            <p className="mt-[14px] text-center text-[11px] text-[var(--color-mist)]">
-              Onboarding takes ~90 seconds. Everything is editable later — including your plan.
-            </p>
           </div>
         </main>
       </div>

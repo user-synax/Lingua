@@ -4,18 +4,30 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PillBadge } from "@/components/ui/Badge";
+import { api } from "@/lib/api";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [devCode, setDevCode] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     if (!email.trim()) return setError("Email is required");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Enter a valid email");
     setError("");
-    setSent(true);
+    setLoading(true);
+    try {
+      const data = await api.forgot({ email: email.trim().toLowerCase() });
+      setDevCode(data.devCode || "");
+      setSent(true);
+    } catch (err) {
+      setError(err.data?.error || err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -27,7 +39,7 @@ export default function ForgotPasswordPage() {
             Reset your password
           </h1>
           <p className="mt-[8px] text-[14px] leading-[1.4] text-[var(--color-lichen-gray)]">
-            We&apos;ll send a reset link that expires in 30 minutes. No email — check spam and your other inbox.
+            Enter your email — we log a 6-digit code to the backend console (no email sent in dev). Use it on the next page.
           </p>
         </div>
       </div>
@@ -48,8 +60,8 @@ export default function ForgotPasswordPage() {
             error={error}
             hint="Use the email you signed up with."
           />
-          <Button type="submit" variant="filled" size="lg" className="w-full">
-            Send reset link →
+          <Button type="submit" variant="filled" size="lg" className="w-full" disabled={loading}>
+            {loading ? "Sending…" : "Send reset code →"}
           </Button>
           <p className="text-center text-[13px] text-[var(--color-lichen-gray)]">
             Remembered?{" "}
@@ -61,23 +73,29 @@ export default function ForgotPasswordPage() {
       ) : (
         <div className="flex flex-col gap-[14px]">
           <div className="rounded-[12px] bg-[var(--color-sage-glow)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[14px]">
-            <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">Check your email</p>
+            <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">Check backend console</p>
             <p className="mt-[4px] text-[13px] leading-[1.5] text-[var(--color-slate)]">
-              If <span className="font-medium text-[var(--color-forest-ink)]">{email}</span> is registered, you&apos;ll get a link in ~1 minute. The link is single-use. Didn&apos;t arrive?{" "}
-              <button onClick={() => setSent(false)} className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
-                Try again
-              </button>
-              .
+              If <span className="font-medium text-[var(--color-forest-ink)]">{email}</span> is registered, a code was logged to the backend and expires in 15 minutes.
+              {devCode && (
+                <span className="mt-[8px] block rounded-[8px] bg-white border border-[var(--color-forest-ink)]/10 px-[10px] py-[8px] font-mono text-[13px] text-[var(--color-forest-ink)]">
+                  Dev code: {devCode} (copy to reset page)
+                </span>
+              )}
             </p>
           </div>
           <div className="rounded-[12px] bg-white border border-[var(--color-forest-ink)]/10 p-[14px]">
-            <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">What&apos;s next</p>
-            <ul className="mt-[8px] list-disc pl-[16px] text-[13px] leading-[1.6] text-[var(--color-lichen-gray)]">
-              <li>Link expires in 30 minutes</li>
-              <li>Open on the same device if possible</li>
-              <li>Contact support if you&apos;re locked out</li>
-            </ul>
+            <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">Next</p>
+            <a href={`/reset-password?email=${encodeURIComponent(email)}`} className="mt-[8px] inline-flex text-[13px] font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
+              Go to reset password →
+            </a>
           </div>
+          <button
+            type="button"
+            onClick={() => setSent(false)}
+            className="text-[13px] font-medium text-[var(--color-forest-ink)] underline underline-offset-2"
+          >
+            Try different email
+          </button>
           <a href="/login">
             <Button variant="outlined" size="lg" className="w-full">
               Back to log in
@@ -86,9 +104,7 @@ export default function ForgotPasswordPage() {
         </div>
       )}
 
-      <p className="mt-[18px] text-center text-[11px] text-[var(--color-mist)]">
-        Demo only — no email is actually sent. Pure UI.
-      </p>
+      <p className="mt-[18px] text-center text-[11px] text-[var(--color-mist)]">No real email sent — code is in backend logs. Secure httpOnly cookies.</p>
     </div>
   );
 }

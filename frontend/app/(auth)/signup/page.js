@@ -5,16 +5,21 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PillBadge } from "@/components/ui/Badge";
+import { api } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { fetchMe } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", password: "", agree: false, age: false });
   const [showPw, setShowPw] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
 
   function upd(k, v) {
     setForm((s) => ({ ...s, [k]: v }));
+    setServerError("");
   }
 
   function validate() {
@@ -30,16 +35,37 @@ export default function SignupPage() {
     return e;
   }
 
-  function onSubmit(ev) {
+  async function onSubmit(ev) {
     ev.preventDefault();
+    setServerError("");
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await api.signup({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+        ageConfirmed: form.age,
+        agree: form.agree,
+      });
+      await fetchMe();
+      router.push("/onboarding");
+    } catch (err) {
+      if (err.data?.issues) {
+        const mapped = {};
+        err.data.issues.forEach((i) => {
+          const field = i.path.replace("body.", "");
+          mapped[field] = i.message;
+        });
+        setErrors(mapped);
+      } else {
+        setServerError(err.message || "Signup failed");
+      }
+    } finally {
       setLoading(false);
-      router.push("/verify?email=" + encodeURIComponent(form.email));
-    }, 700);
+    }
   }
 
   return (
@@ -58,18 +84,29 @@ export default function SignupPage() {
 
       <button
         type="button"
-        onClick={() => router.push("/onboarding")}
+        onClick={() => setServerError("Google login is not available yet — please use email.")}
         className="flex h-[44px] w-full items-center justify-center gap-[10px] rounded-[12px] border border-[var(--color-forest-ink)]/15 bg-white text-[14px] font-medium text-[var(--color-forest-ink)] hover:bg-[var(--color-parchment)] transition-colors"
       >
         <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-black/10 text-[11px] font-bold bg-white">G</span>
         Continue with Google
       </button>
+      {serverError && serverError.includes("Google") && (
+        <p className="mt-[8px] text-center text-[12px] text-amber-700 bg-amber-50 border border-amber-200 rounded-[10px] px-[10px] py-[8px]">
+          {serverError}
+        </p>
+      )}
 
       <div className="my-[18px] flex items-center gap-[12px]">
         <span className="h-px flex-1 bg-[var(--color-forest-ink)]/10" />
         <span className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">or email</span>
         <span className="h-px flex-1 bg-[var(--color-forest-ink)]/10" />
       </div>
+
+      {serverError && !serverError.includes("Google") && (
+        <div className="mb-[12px] rounded-[10px] bg-red-50 border border-red-200 px-[12px] py-[10px] text-[13px] text-red-700">
+          {serverError}
+        </div>
+      )}
 
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-[14px]">
         <Input
@@ -119,7 +156,6 @@ export default function SignupPage() {
           {errors.password && <p className="text-[12px] text-red-600">{errors.password}</p>}
         </div>
 
-        {/* Age gate — PRD 16: 18+ only */}
         <label className={`flex gap-[10px] rounded-[12px] border p-[12px] ${errors.age ? "border-red-300 bg-red-50/40" : "border-[var(--color-forest-ink)]/10 bg-[var(--color-mint-surface)]/50"}`}>
           <input
             type="checkbox"
