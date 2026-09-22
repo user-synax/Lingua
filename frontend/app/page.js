@@ -1,8 +1,19 @@
+"use client";
+
 import { LinguaLogo } from "@/components/ui/Logo";
 import { PillBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import GuestGuard from "@/components/guards/GuestGuard";
 
 export default function Home() {
+  return (
+    <GuestGuard>
+      <HomeContent />
+    </GuestGuard>
+  );
+}
+
+function HomeContent() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Announcement Banner */}

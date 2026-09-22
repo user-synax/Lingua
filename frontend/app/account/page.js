@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { LinguaLogo } from "@/components/ui/Logo";
 import { PillBadge } from "@/components/ui/Badge";
+import BottomNav from "@/components/nav/BottomNav";
 
 function AccountInner() {
   const router = useRouter();
@@ -79,24 +80,27 @@ function AccountInner() {
   const langNames = { de: "German", es: "Spanish", fr: "French", ja: "Japanese", pt: "Portuguese", en: "English", it: "Italian", ko: "Korean" };
 
   return (
-    <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col pb-[88px] md:pb-0">
       <header className="sticky top-0 z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
         <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px]">
           <LinguaLogo />
           <div className="flex items-center gap-[10px]">
-            <a href="/onboarding" className="hidden md:inline text-[13px] font-medium text-[var(--color-lichen-gray)] hover:text-[var(--color-forest-ink)]">
-              Edit plan
+            <a
+              href="/dashboard"
+              className="hidden md:inline text-[13px] font-medium text-[var(--color-lichen-gray)] hover:text-[var(--color-forest-ink)] transition-colors"
+            >
+              Dashboard
             </a>
-            <Button variant="outlined" size="sm" onClick={onLogout}>
+            <Button variant="outlined" size="sm" onClick={onLogout} className="pressable">
               Log out
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1200px] px-[20px] md:px-[24px] py-[28px] flex flex-col gap-[20px]">
+      <main className="mx-auto w-full max-w-[1200px] px-[20px] md:px-[24px] py-[28px] flex flex-col gap-[20px] animate-fade-in">
         {onboarded && (
-          <div className="rounded-[14px] bg-[var(--color-meadow)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[14px] flex items-center justify-between gap-[12px]">
+          <div className="animate-slide-up rounded-[14px] bg-[var(--color-meadow)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[14px] flex items-center justify-between gap-[12px]">
             <div>
               <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">Timetable confirmed — you’re set.</p>
               <p className="text-[13px] text-[var(--color-slate)]">2 live classes + review blocks. We’ll remind you 24h / 1h / 10 min before.</p>
@@ -105,8 +109,8 @@ function AccountInner() {
           </div>
         )}
 
-        <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-[20px]">
-          <div className="rounded-[14px] bg-white p-[22px] md:p-[28px] shadow-[var(--shadow-md)] border border-[var(--color-forest-ink)]/[0.06]">
+        <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-[20px] stagger">
+          <div className="rounded-[14px] bg-white p-[22px] md:p-[28px] shadow-[var(--shadow-md)] border border-[var(--color-forest-ink)]/[0.06] lift">
             <PillBadge>Account</PillBadge>
             <h1 className="mt-[12px] text-[22px] font-medium tracking-[-0.01em] text-[var(--color-forest-ink)]">Your account</h1>
             <p className="mt-[6px] text-[13px] text-[var(--color-lichen-gray)]">Secure session via httpOnly cookies — access 15m, refresh 7d rotation. Email is your ID; name is editable.</p>
@@ -159,8 +163,8 @@ function AccountInner() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-[16px]">
-            <div className="rounded-[14px] bg-[var(--color-mint-surface)] p-[22px] border border-[var(--color-forest-ink)]/5">
+          <div className="flex flex-col gap-[16px] stagger">
+            <div className="rounded-[14px] bg-[var(--color-mint-surface)] p-[22px] border border-[var(--color-forest-ink)]/5 lift">
               <h3 className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">Your plan</h3>
               {!onboarding || (!onboarding.target && !onboarding.goal) ? (
                 <p className="mt-[8px] text-[14px] text-[var(--color-lichen-gray)]">
@@ -200,7 +204,7 @@ function AccountInner() {
               )}
             </div>
 
-            <div className="rounded-[14px] bg-white p-[18px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)]">
+            <div className="rounded-[14px] bg-white p-[18px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)] lift">
               <h3 className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">Session</h3>
               <p className="mt-[8px] text-[13px] leading-[1.5] text-[var(--color-lichen-gray)]">
                 Access token in httpOnly cookie (15 min). Refresh rotation (7 days, sha256-hashed in DB). Logout invalidates refresh server-side — no token survives. Cookies are Lax, Secure in prod, Helmet + rate-limit enabled.
@@ -214,6 +218,8 @@ function AccountInner() {
           </div>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

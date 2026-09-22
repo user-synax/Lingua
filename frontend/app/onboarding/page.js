@@ -65,13 +65,17 @@ export default function OnboardingPage() {
     if (!loading && !user) router.replace("/login?next=/onboarding");
   }, [loading, user, router]);
 
-  // Load existing onboarding
+  // Load existing onboarding — hard block if completed
   useEffect(() => {
     if (!user) return;
     api
       .getOnboarding()
       .then((data) => {
         const o = data.onboarding || data.user?.onboarding || {};
+        if (o.completed) {
+          router.replace("/dashboard");
+          return;
+        }
         if (o.target) setTarget(o.target);
         if (o.nativeLang) setNativeLang(o.nativeLang);
         if (o.goal) setGoal(o.goal);
@@ -79,18 +83,14 @@ export default function OnboardingPage() {
         if (o.hours) setHours(o.hours);
         if (o.timezone) setTz(o.timezone);
         if (o.availability) {
-          // backend returns Map-converted object
           const av = o.availability;
           const isEmpty = !av || Object.keys(av).length === 0;
           if (!isEmpty) setAvail(av);
         }
-        if (o.completed) {
-          // already done — keep in step view but show indicator
-        }
       })
       .catch(() => {})
       .finally(() => setInitialLoading(false));
-  }, [user]);
+  }, [user, router]);
 
   const toggleAvail = (d, s) => {
     const k = `${d}-${s}`;
