@@ -12,6 +12,17 @@ import { LinguaLogo } from "@/components/ui/Logo";
 const STEPS = ["Listening", "Reading", "Speaking", "Writing", "Result"];
 const STORE_KEY = "lingua.placement.mock.v1";
 
+// Lazy initializer: restores an unfinished attempt on this device only
+// (frontend mock, no backend). Guarded for static prerender (no window).
+function loadSaved() {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
 function fmtElapsed(ms) {
   const s = Math.floor(ms / 1000);
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -22,30 +33,19 @@ function PlacementInner() {
   const [step, setStep] = useState(0);
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
-  const [listening, setListening] = useState({});
-  const [reading, setReading] = useState({});
-  const [spoken, setSpoken] = useState("");
-  const [writing, setWriting] = useState("");
-  const [done, setDone] = useState(null);
+  const [saved] = useState(loadSaved);
+  const [listening, setListening] = useState(saved.listening || {});
+  const [reading, setReading] = useState(saved.reading || {});
+  const [spoken, setSpoken] = useState(saved.spoken || "");
+  const [writing, setWriting] = useState(saved.writing || "");
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Restore unfinished attempt on this device only (frontend mock, no backend).
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return;
-      const s = JSON.parse(raw);
-      if (s.listening) setListening(s.listening);
-      if (s.reading) setReading(s.reading);
-      if (s.spoken) setSpoken(s.spoken);
-      if (s.writing) setWriting(s.writing);
-    } catch {}
-  }, []);
-
+  // Persist unfinished attempt on this device only (no setState here).
   useEffect(() => {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({ listening, reading, spoken, writing }));
