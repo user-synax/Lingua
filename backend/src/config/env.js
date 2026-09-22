@@ -11,6 +11,9 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || "development",
   frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
   cookieSecure: process.env.COOKIE_SECURE === "true",
+  livekitUrl: process.env.LIVEKIT_URL || "wss://your-project.livekit.cloud",
+  livekitKey: process.env.LIVEKIT_API_KEY || "devkey_placeholder",
+  livekitSecret: process.env.LIVEKIT_API_SECRET || "devsecret_placeholder_32chars_minimum_______",
 };
 
 if (!env.accessSecret || !env.refreshSecret) {

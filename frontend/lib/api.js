@@ -51,4 +51,9 @@ export const api = {
   // onboarding
   getOnboarding: () => request("/onboarding", { method: "GET" }),
   saveOnboarding: (data) => request("/onboarding", { method: "PUT", body: data }),
+  // rooms — LiveKit
+  listRooms: () => request("/rooms", { method: "GET" }),
+  createRoom: (data) => request("/rooms", { method: "POST", body: data || {} }),
+  getRoom: (name) => request(`/rooms/${name}`, { method: "GET" }),
+  roomToken: (data) => request("/rooms/token", { method: "POST", body: data }),
 };

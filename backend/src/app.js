@@ -7,6 +7,7 @@ import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import onboardingRoutes from "./routes/onboarding.routes.js";
+import roomsRoutes from "./routes/rooms.routes.js";
 import { notFound, errorHandler } from "./middleware/error.js";
 
 export function createApp() {
@@ -44,6 +45,7 @@ export function createApp() {
   app.use("/api/auth", authLimiter, authRoutes);
   app.use("/api/user", userRoutes);
   app.use("/api/onboarding", onboardingRoutes);
+  app.use("/api/rooms", roomsRoutes);
 
   app.use(notFound);
   app.use(errorHandler);
