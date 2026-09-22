@@ -14,8 +14,7 @@ const LANG_NAMES = { de: "German", es: "Spanish", fr: "French", ja: "Japanese", 
 const PLACEMENT_STORE_KEY = "lingua.placement.mock.v1";
 
 // Read-only: show saved mock placement band if the learner completed it
-// on this device. No math change yet — reality check still assumes
-// from-scratch estimates (PRD ON-2 → ON-3 wiring, step 1: display only).
+// on this device. Band feeds realityCheck() as starting level (PRD ON-2 → ON-3).
 function loadPlacementBand() {
   if (typeof window === "undefined") return null;
   try {
@@ -58,8 +57,9 @@ function PlanInner() {
       goal: onboarding.goal || "career",
       hoursPerWeek: onboarding.hours || 6,
       deadline: onboarding.deadline || null,
+      startingBand: placement?.band || null,
     });
-  }, [onboarding]);
+  }, [onboarding, placement]);
 
   if (loading) {
     return (
@@ -114,7 +114,7 @@ function PlanInner() {
                     Placed at {placement.band} (mock) — working toward {placement.next}.
                   </p>
                   <p className="text-[13px] text-[var(--color-lichen-gray)]">
-                    Math below still assumes from-scratch. Full adjustment by band comes next.
+                    Math below is adjusted for starting level (mock estimate).
                   </p>
                 </div>
                 <Button variant="outlined" size="sm" onClick={() => router.push("/placement")}>
