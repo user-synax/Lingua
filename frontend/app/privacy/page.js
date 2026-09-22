@@ -91,7 +91,7 @@ export default function PrivacyPage() {
           <h1 className="mt-[12px] text-[36px] md:text-[47px] font-medium leading-[1] tracking-[-0.02em] md:tracking-[-1.13px] text-[var(--color-forest-ink)]">
             Privacy Policy.
           </h1>
-          <p className="mt-[8px] text-[14px] md:text-[16px] leading-[1.5] text-[var(--color-lichen-gray)]">
+          <p className="mt-[10px] text-[19px] leading-[1.4] text-[var(--color-lichen-gray)]">
             Short version: your plan to run your classes, your voice to teach you, nothing to track you.
           </p>
           <p className="mt-[8px] text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">
@@ -129,13 +129,13 @@ export default function PrivacyPage() {
                   <span className="text-[13px] font-medium tabular-nums text-[var(--color-mist)]">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h2 className="text-[19px] font-medium leading-[1.2] text-[var(--color-forest-ink)]">{s.title}</h2>
+                  <h2 className="text-[22px] font-medium leading-[1.2] tracking-[-0.01em] text-[var(--color-forest-ink)]">{s.title}</h2>
                 </div>
-                <p className="mt-[8px] text-[14px] leading-[1.5] text-[var(--color-lichen-gray)]">{s.body}</p>
+                <p className="mt-[10px] text-[15px] leading-[1.65] text-[var(--color-forest-ink)]">{s.body}</p>
                 {s.points && (
-                  <ul className="mt-[10px] flex flex-col gap-[6px]">
+                  <ul className="mt-[12px] flex flex-col gap-[8px]">
                     {s.points.map((p) => (
-                      <li key={p} className="flex gap-[8px] text-[14px] leading-[1.5] text-[var(--color-forest-ink)]">
+                      <li key={p} className="flex gap-[10px] text-[15px] leading-[1.65] text-[var(--color-forest-ink)]">
                         <span aria-hidden className="mt-[9px] h-[5px] w-[5px] shrink-0 rounded-full bg-[var(--color-forest-ink)]" />
                         {p}
                       </li>
