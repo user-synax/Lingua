@@ -146,6 +146,11 @@ export default function RealityCheck({
             ))}
           </div>
         )}
+        {skills && (
+          <p className="mt-[8px] text-[11px] leading-[1.5] text-[var(--color-mist)]">
+            Skill levels are a mock estimate (1–5) — real placement needs adaptive items + human check.
+          </p>
+        )}
       </div>
     </div>
   );
