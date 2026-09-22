@@ -1,28 +1,25 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-matter",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata = {
-  title: "Lingua - learn language with ai",
-  description: "A serious language-learning platform where a realistic AI teacher runs scheduled live classes in a video room, with a shared board and doubts answered on the spot, for learners of any language.",
+  title: "Lingua — a real class, taught by an AI teacher",
+  description:
+    "A serious language-learning platform where a realistic AI teacher runs scheduled live classes in a video room, with a shared board and doubts answered on the spot.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full`}>
+      <body className="min-h-full flex flex-col bg-[var(--color-parchment)] text-[var(--color-forest-ink)] font-sans antialiased">
+        {children}
+      </body>
     </html>
   );
 }
