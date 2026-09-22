@@ -125,6 +125,7 @@ function PlanInner() {
             <RealityCheck
               check={check}
               targetName={targetName}
+              placement={placement}
               overridden={overridden}
               onEditPlan={() => router.push("/onboarding")}
               onOverride={() => setOverridden(true)}
