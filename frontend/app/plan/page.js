@@ -117,7 +117,7 @@ function PlanInner() {
                     Math below is adjusted for starting level (mock estimate).
                   </p>
                 </div>
-                <Button variant="outlined" size="sm" onClick={() => router.push("/placement")}>
+                <Button variant="outlined" size="sm" className="shrink-0 self-start md:self-center" onClick={() => router.push("/placement")}>
                   Retake placement →
                 </Button>
               </div>
