@@ -4,12 +4,37 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { realityCheck } from "@/lib/plan";
+import { LISTENING_ITEMS, READING_ITEMS, placementBand } from "@/lib/placement";
 import AuthGuard from "@/components/guards/AuthGuard";
 import RealityCheck from "@/components/plan/RealityCheck";
 import { Button } from "@/components/ui/Button";
 import { LinguaLogo } from "@/components/ui/Logo";
 
 const LANG_NAMES = { de: "German", es: "Spanish", fr: "French", ja: "Japanese", pt: "Portuguese", en: "English", it: "Italian", ko: "Korean" };
+const PLACEMENT_STORE_KEY = "lingua.placement.mock.v1";
+
+// Read-only: show saved mock placement band if the learner completed it
+// on this device. No math change yet — reality check still assumes
+// from-scratch estimates (PRD ON-2 → ON-3 wiring, step 1: display only).
+function loadPlacementBand() {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(PLACEMENT_STORE_KEY)) || {};
+    const listeningDone = LISTENING_ITEMS.every((_, i) => saved.listening?.[i] !== undefined);
+    const readingDone = READING_ITEMS.every((_, i) => saved.reading?.[i] !== undefined);
+    const spokenDone = (saved.spoken || "").trim().length >= 20;
+    const writingDone = (saved.writing || "").trim().length >= 20;
+    if (!listeningDone || !readingDone || !spokenDone || !writingDone) return null;
+    return placementBand({
+      listening: LISTENING_ITEMS.map((_, i) => saved.listening[i]),
+      reading: READING_ITEMS.map((_, i) => saved.reading[i]),
+      spoken: saved.spoken,
+      writing: saved.writing,
+    });
+  } catch {
+    return null;
+  }
+}
 
 function PlanInner() {
   const router = useRouter();
@@ -17,6 +42,7 @@ function PlanInner() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [overridden, setOverridden] = useState(false);
+  const [placement] = useState(loadPlacementBand);
 
   useEffect(() => {
     api
@@ -81,6 +107,21 @@ function PlanInner() {
           </div>
         ) : (
           <>
+            {placement && (
+              <div className="rounded-[14px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 px-[16px] py-[14px] flex flex-col md:flex-row md:items-center justify-between gap-[12px]">
+                <div>
+                  <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">
+                    Placed at {placement.band} (mock) — working toward {placement.next}.
+                  </p>
+                  <p className="text-[13px] text-[var(--color-lichen-gray)]">
+                    Math below still assumes from-scratch. Full adjustment by band comes next.
+                  </p>
+                </div>
+                <Button variant="outlined" size="sm" onClick={() => router.push("/placement")}>
+                  Retake placement →
+                </Button>
+              </div>
+            )}
             <RealityCheck
               check={check}
               targetName={targetName}
