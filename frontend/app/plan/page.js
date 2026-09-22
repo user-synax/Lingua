@@ -98,6 +98,9 @@ function PlanInner() {
                 <Button variant="outlined" size="sm" onClick={() => router.push("/onboarding")}>
                   ← Edit plan
                 </Button>
+                <Button variant="outlined" size="sm" onClick={() => router.push("/placement")}>
+                  Take 10-min placement →
+                </Button>
                 <Button variant="filled" size="sm" disabled={!canContinue} onClick={() => router.push("/dashboard")}>
                   {check?.tone === "off" && !overridden ? "Override to continue" : "Confirm — go to dashboard →"}
                 </Button>
