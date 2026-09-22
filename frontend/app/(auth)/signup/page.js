@@ -183,7 +183,7 @@ export default function SignupPage() {
               Terms
             </a>{" "}
             and{" "}
-            <a href="#" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
+            <a href="/privacy" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
               Privacy
             </a>
             . Recordings are optional and deletable.
