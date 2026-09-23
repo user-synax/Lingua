@@ -18,6 +18,15 @@ export default function RealityCheck({
   if (!check) return null;
 
   const unit1CanDo = placement?.canDos?.[0] || "can-do: introduce + ask about doubts";
+  const skills = placement?.skills || null;
+  const skillEntries = skills
+    ? [
+        ["Listening", skills.listening],
+        ["Reading", skills.reading],
+        ["Speaking", skills.speaking],
+        ["Writing", skills.writing],
+      ]
+    : [];
 
   const toneStyles = {
     fit: "bg-[var(--color-meadow)]",
@@ -127,6 +136,21 @@ export default function RealityCheck({
             Unit 3 — Production · <span>mock + checkpoint per unit</span>
           </li>
         </ul>
+        {skills && (
+          <div className="mt-[8px] grid grid-cols-4 gap-[8px] text-center">
+            {skillEntries.map(([label, score]) => (
+              <div key={label} className="rounded-[10px] bg-white px-[8px] py-[10px] border border-[var(--color-forest-ink)]/10">
+                <p className="text-[16px] font-medium leading-none text-[var(--color-forest-ink)]">{score}</p>
+                <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">{label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        {skills && (
+          <p className="mt-[8px] text-[11px] leading-[1.5] text-[var(--color-mist)]">
+            Skill levels are a mock estimate (1–5) — real placement needs adaptive items + human check.
+          </p>
+        )}
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ export default function AuthLayout({ children }) {
         <footer className="py-[20px] text-center">
           <p className="text-[11px] tracking-[0.04em] text-[var(--color-mist)]">
             © 2026 Lingua — a real class, taught by an AI teacher · 18+ only ·{" "}
-            <a href="#" className="underline decoration-[var(--color-mist)] underline-offset-2 hover:text-[var(--color-lichen-gray)]">
+            <a href="/privacy" className="underline decoration-[var(--color-mist)] underline-offset-2 hover:text-[var(--color-lichen-gray)]">
               Privacy
             </a>
           </p>
