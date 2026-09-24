@@ -152,7 +152,7 @@ export default function PrivacyPage() {
         <div className="mx-auto flex max-w-[1200px] flex-col md:flex-row items-center justify-between gap-[10px] px-[20px] md:px-[24px] text-[11px] tracking-[0.04em] text-[var(--color-mist)]">
           <span>© 2026 Lingua — a real school, at a fraction of a tutor’s cost. 18+ only.</span>
           <span className="flex gap-[14px]">
-            <a href="#" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
+            <a href="/terms" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
               Terms
             </a>
             <a href="/privacy" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">

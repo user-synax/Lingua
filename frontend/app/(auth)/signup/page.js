@@ -179,7 +179,7 @@ export default function SignupPage() {
           />
           <span>
             I agree to the{" "}
-            <a href="#" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
+            <a href="/terms" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
               Terms
             </a>{" "}
             and{" "}
