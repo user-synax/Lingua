@@ -73,7 +73,15 @@ const SECTIONS = [
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col">
-      <header className="sticky top-0 z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
+      <header className="liquid-glass-header sticky top-0 z-20 border-b border-[var(--color-forest-ink)]/10">
+        <svg aria-hidden="true" width="0" height="0" className="absolute">
+          <defs>
+            <filter id="lg-privacy">
+              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.02" numOctaves="2" seed="7" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </defs>
+        </svg>
         <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px]">
           <LinguaLogo />
           <Link
