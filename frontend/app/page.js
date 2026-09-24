@@ -46,7 +46,7 @@ function HomeContent() {
             <a href="#" className="hover:text-[var(--color-forest-ink)]">
               Progress
             </a>
-            <a href="#" className="hover:text-[var(--color-forest-ink)]">
+            <a href="/pricing" className="hover:text-[var(--color-forest-ink)]">
               Pricing
             </a>
           </nav>
