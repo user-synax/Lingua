@@ -295,7 +295,7 @@ function HomeContent() {
             <a href="/privacy" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
               Privacy
             </a>
-            <a href="#" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
+            <a href="/contact" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
               Contact
             </a>
           </span>
