@@ -201,9 +201,14 @@ function DashboardInner() {
             <div className="rounded-[14px] bg-white p-[22px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)] text-center">
               <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">No progress yet</p>
               <p className="text-[13px] text-[var(--color-lichen-gray)] mt-[6px] max-w-[520px] mx-auto">Evidence-based can-do statements will appear after your first live class — transcript clips, corrections, attendance plain record. No XP.</p>
-              <Button variant="outlined" size="sm" className="mt-[14px]" onClick={handleCreateRoom}>
-                Start first class →
-              </Button>
+              <div className="mt-[14px] flex justify-center gap-[10px] flex-wrap">
+                <Button variant="outlined" size="sm" onClick={handleCreateRoom}>
+                  Start first class →
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => router.push("/recap")}>
+                  See recap format →
+                </Button>
+              </div>
             </div>
             <div className="rounded-[14px] bg-[var(--color-parchment)] p-[16px] border border-[var(--color-forest-ink)]/10">
               <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>
