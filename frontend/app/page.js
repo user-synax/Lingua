@@ -40,7 +40,7 @@ function HomeContent() {
             <a href="#" className="hover:text-[var(--color-forest-ink)] flex items-center gap-[4px]">
               Platform <span className="text-[10px]">▾</span>
             </a>
-            <a href="#" className="hover:text-[var(--color-forest-ink)]">
+            <a href="/how-it-works" className="hover:text-[var(--color-forest-ink)]">
               How classes work
             </a>
             <a href="#" className="hover:text-[var(--color-forest-ink)]">
