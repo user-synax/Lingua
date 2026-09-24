@@ -22,9 +22,13 @@ function DashboardInner() {
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [creating, setCreating] = useState(false);
   // Saved mock placement band on this device (frontend estimate, no backend).
-  const [placement] = useState(readSavedPlacementBand);
+  // Read in an effect (client-only): reading localStorage during render
+  // produces different server/client HTML and breaks hydration.
+  const [placement, setPlacement] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only store read; avoids hydration mismatch
+    setPlacement(readSavedPlacementBand());
     api
       .getOnboarding()
       .then((d) => setOnboarding(d.onboarding))
