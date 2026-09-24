@@ -77,8 +77,8 @@ export default function PrivacyPage() {
         <svg aria-hidden="true" width="0" height="0" className="absolute">
           <defs>
             <filter id="lg-privacy" x="-20%" y="-20%" width="140%" height="140%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.012 0.004" numOctaves="3" seed="7" result="n" />
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.012 0.004" numOctaves="2" seed="7" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" />
             </filter>
           </defs>
         </svg>
