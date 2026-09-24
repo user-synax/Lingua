@@ -211,8 +211,33 @@ function DashboardInner() {
               </div>
             </div>
             <div className="rounded-[14px] bg-[var(--color-parchment)] p-[16px] border border-[var(--color-forest-ink)]/10">
-              <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>
-              <p className="mt-[6px] text-[12px] text-[var(--color-lichen-gray)]">No streaks. Missed → recording + 2-click replan. Will populate after sessions.</p>
+              <div className="flex items-center justify-between">
+                <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>
+                {!loadingRooms && rooms.length > 0 && (
+                  <span className="rounded-full bg-white border border-[var(--color-forest-ink)]/10 px-[8px] py-[4px] text-[11px] text-[var(--color-lichen-gray)]">
+                    {rooms.length} session{rooms.length === 1 ? "" : "s"}
+                  </span>
+                )}
+              </div>
+              {loadingRooms ? (
+                <div className="mt-[10px] h-[44px] rounded-[12px] bg-white/60 animate-pulse" />
+              ) : rooms.length === 0 ? (
+                <p className="mt-[6px] text-[12px] text-[var(--color-lichen-gray)]">No sessions yet — no streaks. Missed → recording + 2-click replan once sessions exist.</p>
+              ) : (
+                <ul className="mt-[10px] grid gap-[6px]">
+                  {[...rooms]
+                    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+                    .slice(0, 5)
+                    .map((r) => (
+                      <li key={r.name} className="flex items-center justify-between gap-[10px] rounded-[12px] bg-white px-[12px] py-[10px] border border-[var(--color-forest-ink)]/5">
+                        <span className="text-[12px] font-medium text-[var(--color-forest-ink)] truncate">{r.name}</span>
+                        <span className="shrink-0 text-[11px] text-[var(--color-lichen-gray)]">
+                          {new Date(r.updatedAt || r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
           </div>
         )}
