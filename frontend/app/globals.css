@@ -188,6 +188,38 @@ body {
 .tap { transition: transform 100ms ease; }
 .tap:active { transform: scale(0.97); }
 
+/* ——— Experimental: iOS liquid-glass header ——— */
+/* Refraction geometry: fBm fractalNoise (2 octaves) → displacement scale 8
+   (≈ water-like IoR). Viscosity approx: blur 20px + saturate 1.7.
+   Specular: 1px top highlight + soft inner glow. Falls back to frosted
+   parchment where backdrop-filter is unsupported. */
+.liquid-glass-header {
+  background: color-mix(in srgb, var(--color-parchment) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(1.7) brightness(1.04);
+  backdrop-filter: blur(20px) saturate(1.7) brightness(1.04);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-forest-ink) 12%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 8px 32px rgba(0, 31, 31, 0.08);
+}
+.liquid-glass-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
+  filter: url(#lg-privacy);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .liquid-glass-header {
+    background: var(--color-parchment);
+    box-shadow: var(--shadow-md);
+  }
+  .liquid-glass-header::before {
+    display: none;
+  }
+}
+
 /* View Transitions API — smooth page morphs (Next 16) */
 @supports (view-transition-name: root) {
   ::view-transition-old(root),
@@ -202,5 +234,8 @@ body {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .liquid-glass-header::before {
+    display: none;
   }
 }
