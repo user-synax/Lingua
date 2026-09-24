@@ -91,9 +91,6 @@ function HomeContent() {
                   </Button>
                 </a>
               </div>
-              <p className="mt-[14px] text-[13px] leading-[1.5] text-[var(--color-lichen-gray)]">
-                For serious adult learners. 60-minute live classes in groups of 4, with a shared Board and every doubt answered on the spot.
-              </p>
             </div>
             <div className="flex flex-col gap-[12px]">
               <p className="text-[14px] leading-[1.6] text-[var(--color-lichen-gray)]">
