@@ -7,12 +7,6 @@ import { LinguaLogo } from "@/components/ui/Logo";
 // PRD §16; not legal advice. Claims match what the app actually does.
 const SECTIONS = [
   {
-    id: "eligibility",
-    title: "18+ only",
-    body: "Lingua is for adults (18+) only. We ask you to confirm this at signup so we never knowingly handle children's data.",
-    points: ["18+ confirmation is collected at signup.", "Accounts found to belong to minors are closed and their data deleted."],
-  },
-  {
     id: "what-we-store",
     title: "What we store",
     body: "We store only what your classes need — nothing else:",
@@ -150,7 +144,7 @@ export default function PrivacyPage() {
 
       <footer className="border-t border-[var(--color-forest-ink)]/10 py-[22px] mt-auto">
         <div className="mx-auto flex max-w-[1200px] flex-col md:flex-row items-center justify-between gap-[10px] px-[20px] md:px-[24px] text-[11px] tracking-[0.04em] text-[var(--color-mist)]">
-          <span>© 2026 Lingua — a real school, at a fraction of a tutor’s cost. 18+ only.</span>
+          <span>© 2026 Lingua — a real school, at a fraction of a tutor’s cost.</span>
           <span className="flex gap-[14px]">
             <a href="/terms" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
               Terms

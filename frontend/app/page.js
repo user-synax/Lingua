@@ -27,7 +27,7 @@ function HomeContent() {
             </a>
           </span>
           <span className="text-[11px] tracking-[0.06em] uppercase text-[var(--color-lichen-gray)] hidden md:inline">
-            18+ only · No streaks · Evidence, not XP
+            No streaks · Evidence, not XP
           </span>
         </div>
       </div>
@@ -287,7 +287,7 @@ function HomeContent() {
 
       <footer className="border-t border-[var(--color-forest-ink)]/10 py-[22px]">
         <div className="mx-auto flex max-w-[1200px] flex-col md:flex-row items-center justify-between gap-[10px] px-[20px] md:px-[24px] text-[11px] tracking-[0.04em] text-[var(--color-mist)]">
-          <span>© 2026 Lingua — a real school, at a fraction of a tutor’s cost. 18+ only.</span>
+          <span>© 2026 Lingua — a real school, at a fraction of a tutor’s cost.</span>
           <span className="flex gap-[14px]">
             <a href="/terms" className="hover:text-[var(--color-lichen-gray)] underline underline-offset-2">
               Terms
