@@ -48,7 +48,7 @@ export default function RealityCheck({
         </p>
       </div>
 
-      <div className={`rounded-[14px] p-[18px] md:p-[22px] border border-[var(--color-forest-ink)]/10 ${toneStyles[check.tone]}`}>
+      <div className={`rounded-[14px] p-[18px] md:p-[22px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)] ${toneStyles[check.tone]}`}>
         <div className="flex items-center justify-between gap-[10px]">
           <span className="inline-flex rounded-full bg-[var(--color-forest-ink)] px-[10px] py-[5px] text-[11px] font-medium text-white">
             {toneLabel[check.tone]}
@@ -63,15 +63,15 @@ export default function RealityCheck({
           <div className="mt-[14px] grid grid-cols-3 gap-[8px] text-center">
             <div className="rounded-[12px] bg-white p-[10px] border border-[var(--color-forest-ink)]/10">
               <p className="text-[16px] font-medium leading-none text-[var(--color-forest-ink)]">{check.projected}h</p>
-              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">Projected</p>
+              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-slate)]">Projected</p>
             </div>
             <div className="rounded-[12px] bg-white p-[10px] border border-[var(--color-forest-ink)]/10">
               <p className="text-[16px] font-medium leading-none text-[var(--color-forest-ink)]">{check.needCentral}h</p>
-              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">Needed</p>
+              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-slate)]">Needed</p>
             </div>
             <div className="rounded-[12px] bg-white p-[10px] border border-[var(--color-forest-ink)]/10">
               <p className="text-[16px] font-medium leading-none text-[var(--color-forest-ink)]">~{check.neededWeekly}h</p>
-              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">Per week</p>
+              <p className="mt-[4px] text-[11px] tracking-[0.06em] uppercase text-[var(--color-slate)]">Per week</p>
             </div>
           </div>
         )}
