@@ -76,9 +76,9 @@ export default function PrivacyPage() {
       <header className="liquid-glass-header sticky top-0 z-20 border-b border-[var(--color-forest-ink)]/10">
         <svg aria-hidden="true" width="0" height="0" className="absolute">
           <defs>
-            <filter id="lg-privacy">
-              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.02" numOctaves="2" seed="7" result="n" />
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="8" xChannelSelector="R" yChannelSelector="G" />
+            <filter id="lg-privacy" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.012 0.004" numOctaves="3" seed="7" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G" />
             </filter>
           </defs>
         </svg>
