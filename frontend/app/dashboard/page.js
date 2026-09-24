@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import { readSavedPlacementBand } from "@/lib/placement";
 import AuthGuard from "@/components/guards/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
 import { PillBadge } from "@/components/ui/Badge";
@@ -20,6 +21,8 @@ function DashboardInner() {
   const [loadingOnboarding, setLoadingOnboarding] = useState(true);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [creating, setCreating] = useState(false);
+  // Saved mock placement band on this device (frontend estimate, no backend).
+  const [placement] = useState(readSavedPlacementBand);
 
   useEffect(() => {
     api
@@ -210,6 +213,35 @@ function DashboardInner() {
                 </Button>
               </div>
             </div>
+            {placement && (
+              <div className="rounded-[14px] bg-[var(--color-mint-surface)] p-[16px] border border-[var(--color-forest-ink)]/5">
+                <div className="flex items-center justify-between gap-[10px]">
+                  <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Skill snapshot — placement estimate</p>
+                  <span className="shrink-0 rounded-full bg-[var(--color-forest-ink)] px-[8px] py-[4px] text-[11px] font-medium text-white">
+                    {placement.band} → {placement.next}
+                  </span>
+                </div>
+                <div className="mt-[10px] grid gap-[8px]">
+                  {[
+                    ["Listening", placement.skills.listening],
+                    ["Reading", placement.skills.reading],
+                    ["Speaking", placement.skills.speaking],
+                    ["Writing", placement.skills.writing],
+                  ].map(([label, score]) => (
+                    <div key={label}>
+                      <div className="flex justify-between text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">
+                        <span>{label}</span>
+                        <span>{score}/5</span>
+                      </div>
+                      <div className="mt-[6px] h-[6px] rounded-full bg-white overflow-hidden border border-[var(--color-forest-ink)]/5">
+                        <div className="h-full bg-[var(--color-forest-ink)]" style={{ width: `${(score / 5) * 100}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-[8px] text-[11px] text-[var(--color-lichen-gray)]">Mock estimate — real snapshot needs adaptive placement + human check.</p>
+              </div>
+            )}
             <div className="rounded-[14px] bg-[var(--color-parchment)] p-[16px] border border-[var(--color-forest-ink)]/10">
               <div className="flex items-center justify-between">
                 <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>

@@ -105,3 +105,30 @@ export function placementBand({ listening, reading, spoken, written }) {
     disclaimer: "Mock estimate — real placement needs adaptive items + human-rater check (PRD ON-2).",
   };
 }
+
+// Store key the placement flow writes an unfinished/finished attempt to
+// (this device only, frontend mock, no backend).
+export const PLACEMENT_STORE_KEY = "lingua.placement.mock.v1";
+
+// Reads a completed mock attempt saved on this device and returns its
+// placement band, or null when nothing complete is stored.
+// Window-guarded so it is safe during static prerender.
+export function readSavedPlacementBand() {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = JSON.parse(localStorage.getItem(PLACEMENT_STORE_KEY)) || {};
+    const listeningDone = LISTENING_ITEMS.every((_, i) => saved.listening?.[i] !== undefined);
+    const readingDone = READING_ITEMS.every((_, i) => saved.reading?.[i] !== undefined);
+    const spokenDone = (saved.spoken || "").trim().length >= 20;
+    const writingDone = (saved.writing || "").trim().length >= 20;
+    if (!listeningDone || !readingDone || !spokenDone || !writingDone) return null;
+    return placementBand({
+      listening: LISTENING_ITEMS.map((_, i) => saved.listening[i]),
+      reading: READING_ITEMS.map((_, i) => saved.reading[i]),
+      spoken: saved.spoken,
+      writing: saved.writing,
+    });
+  } catch {
+    return null;
+  }
+}
