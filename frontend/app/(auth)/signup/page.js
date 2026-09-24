@@ -30,7 +30,7 @@ export default function SignupPage() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email";
     if (!form.password) e.password = "Create a password";
     else if (form.password.length < 8) e.password = "At least 8 characters";
-    if (!form.age) e.age = "You must confirm you are 18+";
+    if (!form.age) e.age = "Please tick the age-confirmation checkbox above";
     if (!form.agree) e.agree = "Please accept the Terms";
     return e;
   }
@@ -179,7 +179,7 @@ export default function SignupPage() {
           />
           <span>
             I agree to the{" "}
-            <a href="#" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
+            <a href="/terms" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">
               Terms
             </a>{" "}
             and{" "}

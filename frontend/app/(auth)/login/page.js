@@ -158,7 +158,7 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-[18px] rounded-[10px] bg-[var(--color-mint-surface)] px-[12px] py-[10px] text-[11px] leading-[1.4] text-[var(--color-slate)]">
-        Lingua is 18+ only. By continuing you confirm you are 18 or older and agree to our Terms.
+        By continuing you agree to our <a href="/terms" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">Terms</a>.
       </p>
     </div>
   );

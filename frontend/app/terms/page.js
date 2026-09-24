@@ -4,45 +4,46 @@ import { LinguaLogo } from "@/components/ui/Logo";
 
 // Public page — no AuthGuard/GuestGuard so it opens for logged-out
 // signups and logged-in learners alike. Plain-language summary of
-// PRD §16; not legal advice. Claims match what the app actually does.
-// Same clause-card language as /terms (one column, numbered cards),
-// but privacy-owned scope: data only. Rules live in /terms.
+// the product rules in PRD §§4/6/9/13/16; not legal advice. Claims
+// match what the app actually does. Deliberately NOT the privacy
+// page template: terms read as numbered clauses in one column,
+// while /privacy keeps the contents-sidebar document layout.
 const CLAUSES = [
   {
-    title: "What we store",
-    body: "We store only what your classes need — nothing else: your account (name, email, login credentials), your onboarding (target language, own language, goal, deadline, weekly hours, availability windows, time zone), and your rooms (room name, who created it, language and level).",
+    title: "Your account is yours",
+    body: "One account per learner. Keep your login to yourself, keep your plan details up to date on the account page, and you can delete your account there at any time.",
   },
   {
-    title: "What stays on your device",
-    body: "Your placement answers never leave your browser. The mock score is kept in this device's local storage only, so retaking placement on another device starts fresh. Clearing site data removes it.",
+    title: "What you pay for",
+    body: "A subscription with a monthly allowance of live class-hours, plus unlimited asynchronous study — recaps, homework, and review decks built from your own mistakes. Placement and one trial class come before payment, so you see the plan before you pay.",
   },
   {
-    title: "Recordings and transcripts",
-    body: "Class recordings are optional and off unless you agree in the lobby — the notice there tells you before you join. Transcripts exist to show your corrections and can-do evidence, not to profile you. Deletion on request completes within 24 hours.",
+    title: "How classes run",
+    body: "Classes are 60 minutes in small groups. Join from the dashboard link — camera optional, mic required. A class opens once enough learners book it; below that we offer a reschedule or a 1:1 audio session. Miss a class and the recording, notes, and a re-adjusted plan are waiting.",
   },
   {
-    title: "Voice data",
-    body: "Voice runs the class, transcribes what was said verbatim, and scores pronunciation. Our pacing adapts only to response time and error rate — we never build voiceprints and never infer emotions from camera or voice.",
+    title: "Honest progress, no certificates",
+    body: "Placement gives an estimated level band and skill profile — a starting point, not a verdict. Progress is measured in small sub-level steps backed by transcript evidence, and a full level takes on the order of 100–200+ hours. We never promise fluency on a deadline, and completion records are not official qualifications.",
   },
   {
-    title: "Your learner model",
-    body: "We keep a per-learner record so teaching compounds: error patterns with counts, vocabulary state for review, pronunciation issues by sound, plus your goal, interests, and preferred pace. It feeds your recap, homework, and review deck — nothing else.",
+    title: "The AI tutor",
+    body: "Your tutor always identifies as an AI tutor and never claims to be human when asked. It teaches from vetted lesson material, says so when unsure, and points to the reference instead of guessing. Anything it says can be flagged for human review.",
+  },
+  {
+    title: "Use the room well",
+    body: "No harassment of other learners, no attempts to override the tutor's instructions, and no misuse of rooms, transcripts, or review queues. Report, mute, and block are available in group settings. Slang and profanity are legitimate learning content and are taught with register labels — context matters.",
+  },
+  {
+    title: "Breaking these terms",
+    body: "Misuse leads to a warning first, then suspension or closure of the account for repeat or serious cases. If your account is closed for misuse, unused class-hours from the current period are not refunded.",
   },
   {
     title: "Payments",
-    body: "Payments are handled by Stripe plus local methods such as UPI — your card or bank details go to them, never to our servers. We keep only the fact of your subscription (plan and status) so we can unlock your classes.",
-  },
-  {
-    title: "Cookies and tracking",
-    body: "We run no advertising trackers and sell no data. The essentials: a session cookie that keeps you logged in, and local storage for your unfinished placement attempt. Nothing follows you around the web.",
-  },
-  {
-    title: "Your rights",
-    body: "Edit your name and plan from your account page, and delete your account there at any time — deletion removes your account and stored answers. Copies of your data, corrections, and regional requests (GDPR, India's DPDP Act, CCPA): contact us and we will respond.",
+    body: "Payments run through Stripe plus local methods such as UPI — card and bank details go to the processor, never to our servers. Refunds follow the plan terms shown at checkout.",
   },
 ];
 
-export default function PrivacyPage() {
+export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col">
       <header className="sticky top-0 z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
@@ -59,24 +60,24 @@ export default function PrivacyPage() {
 
       <main className="mx-auto w-full max-w-[720px] px-[20px] md:px-[24px] py-[20px] md:py-[28px] flex flex-col gap-[20px]">
         <div>
-          <PillBadge>Legal · Privacy Policy</PillBadge>
+          <PillBadge>Legal · Terms of Service</PillBadge>
           <h1 className="mt-[12px] text-[36px] md:text-[47px] font-medium leading-[1] tracking-[-0.02em] md:tracking-[-1.13px] text-[var(--color-forest-ink)]">
-            Privacy Policy.
+            Terms of Service.
           </h1>
           <p className="mt-[10px] text-[19px] leading-[1.4] text-[var(--color-lichen-gray)]">
-            Short version: your plan runs your classes, your voice teaches you, nothing tracks you.
+            The rules of the classroom: what you pay for, how classes run, and how to keep your seat.
           </p>
           <p className="mt-[8px] text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">
-            Effective September 2026 · 4 min read · plain-language summary, not legal advice
+            Effective September 2026 · 3 min read · plain-language summary, not legal advice
           </p>
         </div>
 
-        <div className="rounded-[14px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 p-[18px] shadow-[var(--shadow-md)]">
+        <div className="rounded-[14px] bg-[var(--color-buttercream)] border border-[var(--color-forest-ink)]/10 p-[18px] shadow-[var(--shadow-md)]">
           <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">The short version</p>
           <ul className="mt-[10px] grid gap-[8px] text-[13px] leading-[1.5] text-[var(--color-forest-ink)]">
-            <li>Only class-essential data — account, plan, rooms, learner model.</li>
-            <li>Placement stays on your device; recordings stay off unless you agree.</li>
-            <li>No trackers, no sale of data, deletion on request.</li>
+            <li>Pay for real class-hours — placement and a trial class come first.</li>
+            <li>Small groups; thin classes reschedule instead of running empty.</li>
+            <li>Treat the room well — misuse costs the seat.</li>
           </ul>
         </div>
 
@@ -97,13 +98,13 @@ export default function PrivacyPage() {
           ))}
         </ol>
 
-        <div className="rounded-[14px] bg-[var(--color-lavender-surface)] border border-[var(--color-forest-ink)]/10 p-[18px]">
+        <div className="rounded-[14px] bg-[var(--color-mint-surface)] border border-[var(--color-forest-ink)]/10 p-[18px]">
           <p className="text-[13px] leading-[1.5] text-[var(--color-forest-ink)]">
-            The rules of the classroom — classes, payments, and fair use — live in our{" "}
-            <Link href="/terms" className="font-medium underline underline-offset-2">
-              Terms of Service
+            How we handle recordings, voice, and your data lives in our{" "}
+            <Link href="/privacy" className="font-medium underline underline-offset-2">
+              Privacy Policy
             </Link>
-            . Policy changes that matter get a new date at the top before they take effect.
+            . Questions about these terms: contact us and a human replies.
           </p>
         </div>
       </main>
