@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/guards/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
+import CorrectionsCard from "@/components/recap/CorrectionsCard";
 import { PillBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LinguaLogo } from "@/components/ui/Logo";
@@ -51,6 +52,8 @@ function RecapInner() {
             </Button>
           </div>
         </div>
+
+        <CorrectionsCard items={[]} />
 
         <div className="rounded-[14px] bg-[var(--color-lavender-surface)] p-[16px] border border-[var(--color-forest-ink)]/5">
           <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">What will appear here</p>
