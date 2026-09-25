@@ -1,4 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// Same-origin by default: requests go to this host's /api and Next.js
+// proxies them to BACKEND_URL (see rewrites in next.config.mjs). Keeps
+// auth cookies first-party on every domain. Override only when the page
+// must call an API on another origin directly (then cookies need the
+// backend's cooperation).
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 async function request(path, { method = "GET", body, headers = {}, credentials = "include" } = {}) {
   const url = `${API_URL}/api${path}`;
