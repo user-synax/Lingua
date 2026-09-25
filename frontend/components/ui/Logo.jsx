@@ -15,16 +15,12 @@ export function LinguaLogo({ size = "md" }) {
         className={`inline-flex items-center justify-center bg-[var(--color-forest-ink)] text-white shadow-[var(--shadow-md)] ${tiles[size]}`}
       >
         <svg viewBox="0 0 20 20" fill="none" aria-hidden className="h-[62%] w-[62%]">
-          {/* L stem + foot, optically centered, round caps */}
-          <path
-            d="M5.8 3.5v10.2h6.4"
-            stroke="white"
-            strokeWidth="2.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          {/* meadow full-stop: every doubt answered */}
-          <circle cx="14.2" cy="13.7" r="1.7" fill="#cdface" />
+          {/* ascending bars: measurable progress, A1 to C1 — square-cut, grid-built */}
+          <rect x="4.9" y="10.6" width="2.7" height="5.4" rx="0.6" fill="white" />
+          <rect x="8.65" y="7.6" width="2.7" height="8.4" rx="0.6" fill="white" />
+          <rect x="12.4" y="4.6" width="2.7" height="11.4" rx="0.6" fill="white" />
+          {/* meadow baseline: evidence, not points */}
+          <rect x="4.9" y="16.6" width="10.2" height="1.4" rx="0.7" fill="#cdface" />
         </svg>
       </span>
       <span
