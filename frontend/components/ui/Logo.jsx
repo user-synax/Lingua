@@ -20,7 +20,7 @@ export function LinguaLogo({ size = "md" }) {
       </span>
       <span
         aria-hidden
-        className="ml-[0.08em] inline-block h-[0.3em] w-[0.3em] translate-y-[-0.04em] rounded-full bg-[var(--color-meadow)]"
+        className="ml-[0.08em] inline-block h-[0.34em] w-[0.34em] translate-y-[-0.04em] rounded-full bg-[var(--color-deep-forest)]"
       />
     </a>
   );
