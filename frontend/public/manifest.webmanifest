@@ -1,0 +1,26 @@
+{
+  "name": "Lingua — a real class, taught by an AI teacher",
+  "short_name": "Lingua",
+  "description": "A serious language-learning platform where a realistic AI teacher runs scheduled live classes in a video room.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f6f2",
+  "theme_color": "#f7f6f2",
+  "icons": [
+    {
+      "src": "/icon",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
