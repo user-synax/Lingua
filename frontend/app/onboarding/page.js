@@ -176,7 +176,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-parchment)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--color-forest-ink)]/10 bg-[var(--color-parchment)]/85 backdrop-blur">
+      <header className="sticky top-0 pt-[env(safe-area-inset-top)] z-20 border-b border-[var(--color-forest-ink)]/10 bg-[var(--color-parchment)]/85 backdrop-blur">
         <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px] gap-[16px]">
           <LinguaLogo />
           <div className="hidden md:flex items-center gap-[12px] text-[13px]">

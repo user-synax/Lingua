@@ -5,7 +5,7 @@ export default function AuthLayout({ children }) {
   return (
     <GuestGuard>
       <div className="min-h-screen flex flex-col animate-fade-in">
-        <header className="sticky top-0 z-10 border-b border-[var(--color-forest-ink)]/10 bg-[var(--color-parchment)]/80 backdrop-blur">
+        <header className="sticky top-0 pt-[env(safe-area-inset-top)] z-10 border-b border-[var(--color-forest-ink)]/10 bg-[var(--color-parchment)]/80 backdrop-blur">
           <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px]">
             <LinguaLogo />
             <a
