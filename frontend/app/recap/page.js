@@ -6,12 +6,13 @@ import AuthGuard from "@/components/guards/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
 import CorrectionsCard from "@/components/recap/CorrectionsCard";
 import ParkedDoubtsCard from "@/components/recap/ParkedDoubtsCard";
+import KeyItemsCard from "@/components/recap/KeyItemsCard";
 import { PillBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LinguaLogo } from "@/components/ui/Logo";
 
-// PRD AC-1 recap — corrections + parked doubts live (frontend, no backend).
-// Future slices add key items, talk share, transcript, homework.
+// PRD AC-1 recap — corrections + parked doubts + key items live (frontend, no backend).
+// Future slices add talk share, transcript, homework.
 // This shell shows the empty state so rooms have somewhere to go after class.
 function RecapInner() {
   const router = useRouter();
@@ -56,6 +57,8 @@ function RecapInner() {
         <CorrectionsCard items={[]} />
 
         <ParkedDoubtsCard items={[]} />
+
+        <KeyItemsCard items={[]} />
 
         <div className="rounded-[14px] bg-[var(--color-lavender-surface)] p-[16px] border border-[var(--color-forest-ink)]/5">
           <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">What will appear here</p>
