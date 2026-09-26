@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/Button";
 
 export default function Lobby({ roomName, onJoin, joining }) {
   const videoRef = useRef(null);
+  const streamRef = useRef(null);
   const [camOn, setCamOn] = useState(true);
   const [micOn, setMicOn] = useState(true);
-  const [stream, setStream] = useState(null);
   const [devices, setDevices] = useState({ cameras: [], mics: [], speakers: [] });
+  const [devicesReady, setDevicesReady] = useState(false);
   const [selectedCam, setSelectedCam] = useState("");
   const [selectedMic, setSelectedMic] = useState("");
   const [error, setError] = useState("");
@@ -25,69 +26,65 @@ export default function Lobby({ roomName, onJoin, joining }) {
           mics: devs.filter((d) => d.kind === "audioinput"),
           speakers: devs.filter((d) => d.kind === "audiooutput"),
         });
-        setHasMic(devs.some((d) => d.kind === "audioinput"));
         if (devs.find((d) => d.kind === "videoinput")) setSelectedCam(devs.find((d) => d.kind === "videoinput").deviceId);
         if (devs.find((d) => d.kind === "audioinput")) setSelectedMic(devs.find((d) => d.kind === "audioinput").deviceId);
       } catch {
         setError("Could not list devices — check browser permissions.");
+      } finally {
+        setDevicesReady(true);
       }
     }
     loadDevices();
   }, []);
 
+  // Single live preview stream: cam + mic together, held until device
+  // change / toggle / unmount / join. Preview video stays muted (no echo);
+  // the mic track runs live so Join inherits workable devices.
   useEffect(() => {
-    let s;
-    async function startPreview() {
-      if (!camOn) {
-        if (stream) {
-          stream.getTracks().forEach((t) => t.stop());
-          setStream(null);
-        }
-        if (videoRef.current) videoRef.current.srcObject = null;
+    if (!devicesReady) return;
+    let cancelled = false;
+    let live = null;
+    async function start() {
+      // stop previous before restart (device switch / toggle)
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+      }
+      if (videoRef.current) videoRef.current.srcObject = null;
+      if (!camOn && !micOn) {
+        setHasMic(false);
         return;
       }
+      const wantVideo = camOn ? (selectedCam ? { deviceId: { exact: selectedCam } } : true) : false;
+      const wantAudio = micOn ? (selectedMic ? { deviceId: { exact: selectedMic } } : true) : false;
       try {
-        s = await navigator.mediaDevices.getUserMedia({
-          video: selectedCam ? { deviceId: { exact: selectedCam } } : true,
-          audio: false,
-        });
-        setStream(s);
-        if (videoRef.current) videoRef.current.srcObject = s;
+        live = await navigator.mediaDevices.getUserMedia({ video: wantVideo, audio: wantAudio });
+        if (cancelled) {
+          live.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        streamRef.current = live;
+        if (videoRef.current) videoRef.current.srcObject = camOn ? live : null;
+        setHasMic(!!live.getAudioTracks()[0] && micOn);
         setError("");
-      } catch (e) {
-        setError("Camera blocked — allow access or turn camera off (optional).");
-      }
-    }
-    startPreview();
-    return () => {
-      if (s) s.getTracks().forEach((t) => t.stop());
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [camOn, selectedCam]);
-
-  // check mic permission separately
-  useEffect(() => {
-    async function checkMic() {
-      if (!micOn) return;
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({ audio: selectedMic ? { deviceId: { exact: selectedMic } } : true, video: false });
-        s.getTracks().forEach((t) => t.stop());
-        setError((prev) => (prev.includes("Camera") ? prev : ""));
-        setHasMic(true);
       } catch {
-        setError("Microphone required — allow mic access. Camera is optional.");
-        setHasMic(false);
+        if (cancelled) return;
+        if (videoRef.current) videoRef.current.srcObject = null;
+        if (micOn) {
+          setError("Microphone required — allow mic access. Camera is optional.");
+          setHasMic(false);
+        } else if (camOn) {
+          setError("Camera blocked — allow access or turn camera off (optional).");
+        }
       }
     }
-    checkMic();
-  }, [micOn, selectedMic]);
-
-  // cleanup on unmount
-  useEffect(() => {
+    start();
     return () => {
-      if (stream) stream.getTracks().forEach((t) => t.stop());
+      cancelled = true;
+      if (live) live.getTracks().forEach((t) => t.stop());
+      if (streamRef.current === live) streamRef.current = null;
     };
-  }, [stream]);
+  }, [devicesReady, camOn, micOn, selectedCam, selectedMic]);
 
   return (
     <div className="mx-auto max-w-[980px] w-full grid md:grid-cols-[1.35fr_0.85fr] gap-[18px] animate-slide-up-soft">
