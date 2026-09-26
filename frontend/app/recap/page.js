@@ -19,7 +19,13 @@ function RecapInner() {
 
   return (
     <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col pb-[88px] md:pb-0">
-      <header className="sticky top-0 pt-[env(safe-area-inset-top)] z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
+      <header
+        className="sticky top-0 pt-[env(safe-area-inset-top)] z-20 bg-[var(--glass-nav-bg)] border-b border-[var(--glass-border)] shadow-[var(--glass-shadow)]"
+        style={{
+          backdropFilter: "blur(var(--glass-blur-sm)) saturate(var(--glass-saturate))",
+          WebkitBackdropFilter: "blur(var(--glass-blur-sm)) saturate(var(--glass-saturate))",
+        }}
+      >
         <div className="mx-auto flex h-[64px] max-w-[1100px] items-center justify-between px-[20px] md:px-[24px]">
           <LinguaLogo />
           <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")}>
