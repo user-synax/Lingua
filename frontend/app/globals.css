@@ -73,6 +73,20 @@
     color(srgb 0 0.121569 0.121569 / 0.04) 0px 3px 3px -1.5px,
     color(srgb 0 0.121569 0.121569 / 0.08) 0px 1px 1px -0.5px,
     color(srgb 0 0.121569 0.121569 / 0.04) 0px 0px 0px 1px;
+
+  /* Functional glass — Apple touch on Lattice base. Floating nav/toolbar/sheet only. Never content cards. */
+  --glass-nav-bg: rgb(247 246 242 / 0.72);
+  --glass-toolbar-bg: rgb(247 246 242 / 0.68);
+  --glass-sheet-bg: rgb(255 255 255 / 0.72);
+  --glass-border: color(srgb 0 0.121569 0.121569 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.4);
+  --glass-blur: 20px;
+  --glass-blur-sm: 12px;
+  --glass-saturate: 1.4;
+  --glass-shadow:
+    color(srgb 0 0.121569 0.121569 / 0.06) 0px 12px 32px -12px,
+    color(srgb 0 0.121569 0.121569 / 0.08) 0px 1px 1px -0.5px,
+    color(srgb 0 0.121569 0.121569 / 0.04) 0px 0px 0px 1px;
 }
 
 @theme inline {
@@ -112,6 +126,10 @@
   --radius-badges: var(--radius-badges);
   --radius-inputs: var(--radius-inputs);
   --radius-buttons: var(--radius-buttons);
+
+  --color-glass-nav: var(--glass-nav-bg);
+  --color-glass-toolbar: var(--glass-toolbar-bg);
+  --color-glass-sheet: var(--glass-sheet-bg);
 }
 
 * {
@@ -202,5 +220,17 @@ body {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Respect reduced transparency — fall back to solid Lattice surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-nav-bg: var(--color-parchment);
+    --glass-toolbar-bg: var(--color-parchment);
+    --glass-sheet-bg: var(--color-paper-white);
+    --glass-blur: 0px;
+    --glass-blur-sm: 0px;
+    --glass-saturate: 1;
   }
 }
