@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import AuthGuard from "@/components/guards/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
 import CorrectionsCard from "@/components/recap/CorrectionsCard";
+import ParkedDoubtsCard from "@/components/recap/ParkedDoubtsCard";
 import { PillBadge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LinguaLogo } from "@/components/ui/Logo";
 
-// PRD AC-1 recap — route shell only (frontend, no backend).
-// Future slices add corrections, parked doubts, talk share,
-// transcript, homework. This shell shows the empty state so
-// rooms have somewhere to go after class.
+// PRD AC-1 recap — corrections + parked doubts live (frontend, no backend).
+// Future slices add key items, talk share, transcript, homework.
+// This shell shows the empty state so rooms have somewhere to go after class.
 function RecapInner() {
   const router = useRouter();
 
@@ -55,10 +55,12 @@ function RecapInner() {
 
         <CorrectionsCard items={[]} />
 
+        <ParkedDoubtsCard items={[]} />
+
         <div className="rounded-[14px] bg-[var(--color-lavender-surface)] p-[16px] border border-[var(--color-forest-ink)]/5">
           <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-slate)]">What will appear here</p>
           <p className="mt-[6px] text-[13px] leading-[1.5] text-[var(--color-lichen-gray)]">
-            Corrections with redlines · parked doubts answered · talk share · transcript · homework (10–15 min). Each item ships as its own small change.
+            Corrections with redlines · talk share · transcript · homework (10–15 min). Each item ships as its own small change.
           </p>
         </div>
       </main>
