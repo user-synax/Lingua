@@ -67,13 +67,54 @@ export default function Lobby({ roomName, onJoin, joining }) {
         if (videoRef.current) videoRef.current.srcObject = camOn ? live : null;
         setHasMic(!!live.getAudioTracks()[0] && micOn);
         setError("");
-      } catch {
+      } catch (e) {
         if (cancelled) return;
-        if (videoRef.current) videoRef.current.srcObject = null;
+        // getUserMedia fails atomically: one blocked device must not kill
+        // the other. Camera is optional, mic gates Join — so fall back to
+        // audio-only first, then video-only. Stale exact deviceIds (unplugged
+        // device) retry once with generic constraints.
+        const generic = e?.name === "OverconstrainedError";
+        if (micOn) {
+          try {
+            live = await navigator.mediaDevices.getUserMedia({
+              video: false,
+              audio: generic ? true : selectedMic ? { deviceId: { exact: selectedMic } } : true,
+            });
+            if (cancelled) {
+              live.getTracks().forEach((t) => t.stop());
+              return;
+            }
+            streamRef.current = live;
+            if (videoRef.current) videoRef.current.srcObject = null;
+            setHasMic(true);
+            setError(camOn ? "Camera blocked — allow access or turn camera off (optional). Mic stays live." : "");
+            return;
+          } catch {
+            if (cancelled) return;
+          }
+        }
+        if (camOn) {
+          try {
+            live = await navigator.mediaDevices.getUserMedia({
+              video: generic ? true : selectedCam ? { deviceId: { exact: selectedCam } } : true,
+              audio: false,
+            });
+            if (cancelled) {
+              live.getTracks().forEach((t) => t.stop());
+              return;
+            }
+            streamRef.current = live;
+            if (videoRef.current) videoRef.current.srcObject = live;
+            if (!micOn) setError("");
+          } catch {
+            if (cancelled) return;
+          }
+        }
+        if (videoRef.current && !streamRef.current) videoRef.current.srcObject = null;
         if (micOn) {
           setError("Microphone required — allow mic access. Camera is optional.");
           setHasMic(false);
-        } else if (camOn) {
+        } else if (camOn && !streamRef.current) {
           setError("Camera blocked — allow access or turn camera off (optional).");
         }
       }
