@@ -1,4 +1,9 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+// Same-origin by default: requests go to this host's /api and Next.js
+// proxies them to BACKEND_URL (see rewrites in next.config.mjs). Keeps
+// auth cookies first-party on every domain. Override only when the page
+// must call an API on another origin directly (then cookies need the
+// backend's cooperation).
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 async function request(path, { method = "GET", body, headers = {}, credentials = "include" } = {}) {
   const url = `${API_URL}/api${path}`;
@@ -12,7 +17,21 @@ async function request(path, { method = "GET", body, headers = {}, credentials =
   };
   if (body !== undefined) opts.body = JSON.stringify(body);
 
-  const res = await fetch(url, opts);
+  let res;
+  try {
+    res = await fetch(url, opts);
+  } catch (e) {
+    // Network-level failure: DNS, refused connection, or the browser
+    // blocking the request (e.g. an https page calling an http/localhost
+    // API). The backend simply isn't reachable from this site — surface
+    // that plainly instead of the raw "Failed to fetch".
+    const err = new Error(
+      `Cannot reach the API at ${API_URL}. The backend isn't publicly hosted yet — use the local dev site (http://localhost:3000) or configure a public API URL.`
+    );
+    err.status = 0;
+    err.cause = e;
+    throw err;
+  }
   const text = await res.text();
   let data;
   try {

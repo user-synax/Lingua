@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { api } from "@/lib/api";
+import { readSavedPlacementBand } from "@/lib/placement";
 import AuthGuard from "@/components/guards/AuthGuard";
 import BottomNav from "@/components/nav/BottomNav";
 import { PillBadge } from "@/components/ui/Badge";
@@ -20,8 +21,14 @@ function DashboardInner() {
   const [loadingOnboarding, setLoadingOnboarding] = useState(true);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [creating, setCreating] = useState(false);
+  // Saved mock placement band on this device (frontend estimate, no backend).
+  // Read in an effect (client-only): reading localStorage during render
+  // produces different server/client HTML and breaks hydration.
+  const [placement, setPlacement] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only store read; avoids hydration mismatch
+    setPlacement(readSavedPlacementBand());
     api
       .getOnboarding()
       .then((d) => setOnboarding(d.onboarding))
@@ -201,13 +208,72 @@ function DashboardInner() {
             <div className="rounded-[14px] bg-white p-[22px] border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)] text-center">
               <p className="text-[14px] font-medium text-[var(--color-forest-ink)]">No progress yet</p>
               <p className="text-[13px] text-[var(--color-lichen-gray)] mt-[6px] max-w-[520px] mx-auto">Evidence-based can-do statements will appear after your first live class — transcript clips, corrections, attendance plain record. No XP.</p>
-              <Button variant="outlined" size="sm" className="mt-[14px]" onClick={handleCreateRoom}>
-                Start first class →
-              </Button>
+              <div className="mt-[14px] flex justify-center gap-[10px] flex-wrap">
+                <Button variant="outlined" size="sm" onClick={handleCreateRoom}>
+                  Start first class →
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => router.push("/recap")}>
+                  See recap format →
+                </Button>
+              </div>
             </div>
+            {placement && (
+              <div className="rounded-[14px] bg-[var(--color-mint-surface)] p-[16px] border border-[var(--color-forest-ink)]/5">
+                <div className="flex items-center justify-between gap-[10px]">
+                  <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Skill snapshot — placement estimate</p>
+                  <span className="shrink-0 rounded-full bg-[var(--color-forest-ink)] px-[8px] py-[4px] text-[11px] font-medium text-white">
+                    {placement.band} → {placement.next}
+                  </span>
+                </div>
+                <div className="mt-[10px] grid gap-[8px]">
+                  {[
+                    ["Listening", placement.skills.listening],
+                    ["Reading", placement.skills.reading],
+                    ["Speaking", placement.skills.speaking],
+                    ["Writing", placement.skills.writing],
+                  ].map(([label, score]) => (
+                    <div key={label}>
+                      <div className="flex justify-between text-[11px] tracking-[0.06em] uppercase text-[var(--color-mist)]">
+                        <span>{label}</span>
+                        <span>{score}/5</span>
+                      </div>
+                      <div className="mt-[6px] h-[6px] rounded-full bg-white overflow-hidden border border-[var(--color-forest-ink)]/5">
+                        <div className="h-full bg-[var(--color-forest-ink)]" style={{ width: `${(score / 5) * 100}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-[8px] text-[11px] text-[var(--color-lichen-gray)]">Mock estimate — real snapshot needs adaptive placement + human check.</p>
+              </div>
+            )}
             <div className="rounded-[14px] bg-[var(--color-parchment)] p-[16px] border border-[var(--color-forest-ink)]/10">
-              <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>
-              <p className="mt-[6px] text-[12px] text-[var(--color-lichen-gray)]">No streaks. Missed → recording + 2-click replan. Will populate after sessions.</p>
+              <div className="flex items-center justify-between">
+                <p className="text-[12px] font-medium text-[var(--color-forest-ink)]">Attendance — plain record</p>
+                {!loadingRooms && rooms.length > 0 && (
+                  <span className="rounded-full bg-white border border-[var(--color-forest-ink)]/10 px-[8px] py-[4px] text-[11px] text-[var(--color-lichen-gray)]">
+                    {rooms.length} session{rooms.length === 1 ? "" : "s"}
+                  </span>
+                )}
+              </div>
+              {loadingRooms ? (
+                <div className="mt-[10px] h-[44px] rounded-[12px] bg-white/60 animate-pulse" />
+              ) : rooms.length === 0 ? (
+                <p className="mt-[6px] text-[12px] text-[var(--color-lichen-gray)]">No sessions yet — no streaks. Missed → recording + 2-click replan once sessions exist.</p>
+              ) : (
+                <ul className="mt-[10px] grid gap-[6px]">
+                  {[...rooms]
+                    .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+                    .slice(0, 5)
+                    .map((r) => (
+                      <li key={r.name} className="flex items-center justify-between gap-[10px] rounded-[12px] bg-white px-[12px] py-[10px] border border-[var(--color-forest-ink)]/5">
+                        <span className="text-[12px] font-medium text-[var(--color-forest-ink)] truncate">{r.name}</span>
+                        <span className="shrink-0 text-[11px] text-[var(--color-lichen-gray)]">
+                          {new Date(r.updatedAt || r.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
           </div>
         )}

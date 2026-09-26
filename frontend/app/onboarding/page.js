@@ -271,7 +271,7 @@ export default function OnboardingPage() {
             </div>
 
             <p className="text-[11px] leading-[1.5] text-[var(--color-mist)]">
-              No streaks, no XP. Progress = can-do statements with transcript evidence. 18+ only.
+              No streaks, no XP. Progress = can-do statements with transcript evidence.
             </p>
           </div>
         </aside>

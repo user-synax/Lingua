@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PillBadge } from "@/components/ui/Badge";
@@ -9,7 +9,16 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="grid place-items-center py-[40px] text-sm">Loading…</div>}>
+      <LoginInner />
+    </Suspense>
+  );
+}
+
+function LoginInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { fetchMe } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,8 +45,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await api.login({ email: email.trim().toLowerCase(), password });
-      await fetchMe();
-      router.push("/onboarding");
+      // The login response carries the user, but the session lives in the
+      // cookie. If the cookie didn't stick (e.g. site opened via a LAN/IP
+      // address while the API is on localhost), do NOT push into the
+      // onboarding guard loop — say so explicitly instead.
+      const me = await fetchMe();
+      if (!me) {
+        setServerError(
+          "Login succeeded but the session didn't stick in this browser. Open the site at http://localhost:3000 (not an IP address) and try again."
+        );
+        return;
+      }
+      const next = searchParams.get("next");
+      router.push(next && next.startsWith("/") && !next.startsWith("//") ? next : "/onboarding");
     } catch (err) {
       if (err.data?.issues) {
         const mapped = {};
@@ -158,7 +178,7 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-[18px] rounded-[10px] bg-[var(--color-mint-surface)] px-[12px] py-[10px] text-[11px] leading-[1.4] text-[var(--color-slate)]">
-        Lingua is 18+ only. By continuing you confirm you are 18 or older and agree to our Terms.
+        By continuing you agree to our <a href="/terms" className="font-medium text-[var(--color-forest-ink)] underline underline-offset-2">Terms</a>.
       </p>
     </div>
   );
