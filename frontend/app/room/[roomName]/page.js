@@ -10,6 +10,12 @@ import RoomView from "@/components/room/RoomView";
 import { LinguaLogo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 
+// Video service not connected on the backend (token endpoint answers 503
+// isPlaceholder). One honest line for learners; raw detail to the console
+// for the engineer. Real rooms arrive once backend keys exist.
+const ROOMS_OFF_MESSAGE =
+  "Live rooms aren't switched on yet — the video service isn't connected. Placement, plan, and recap still work.";
+
 function RoomInner() {
   const params = useParams();
   const roomName = params.roomName;
@@ -28,15 +34,19 @@ function RoomInner() {
     try {
       const data = await api.roomToken({ roomName, participantName: user?.name || user?.email });
       if (data.isPlaceholder) {
-        setError(data.error + " — " + data.hint);
+        console.warn("Room token placeholder:", data);
+        setError(ROOMS_OFF_MESSAGE);
         return;
       }
       setToken(data.token);
       setUrl(data.url);
     } catch (e) {
-      const msg = e.data?.error || e.message || "Failed to get token";
-      if (e.data?.isPlaceholder) setError(e.data.error);
-      else setError(msg);
+      if (e.data?.isPlaceholder) {
+        console.warn("Room token placeholder:", e.data);
+        setError(ROOMS_OFF_MESSAGE);
+      } else {
+        setError(e.data?.error || e.message || "Failed to get token");
+      }
     } finally {
       setJoining(false);
     }
@@ -68,7 +78,6 @@ function RoomInner() {
             {error && (
               <div className="rounded-[12px] bg-amber-50 border border-amber-200 px-[14px] py-[12px] text-[13px] text-amber-800">
                 {error}
-                <p className="text-[11px] text-amber-700 mt-[6px]">Set LIVEKIT_URL / API_KEY / SECRET in backend/.env and restart. See backend/.env.example.</p>
               </div>
             )}
             <Lobby roomName={roomName} onJoin={handleJoin} joining={joining} />
