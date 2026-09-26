@@ -24,7 +24,7 @@ const STEPS = [
 export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col">
-      <header className="sticky top-0 z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
+      <header className="sticky top-0 pt-[env(safe-area-inset-top)] z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
         <div className="mx-auto flex h-[64px] max-w-[1200px] items-center justify-between px-[20px] md:px-[24px]">
           <LinguaLogo />
           <div className="flex items-center gap-[10px]">
