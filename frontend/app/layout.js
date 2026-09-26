@@ -13,6 +13,16 @@ export const metadata = {
   title: "Lingua — a real class, taught by an AI teacher",
   description:
     "A serious language-learning platform where a realistic AI teacher runs scheduled live classes in a video room, with a shared board and doubts answered on the spot.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icon",
+    apple: "/apple-icon",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Lingua",
+    statusBarStyle: "default",
+  },
 };
 
 // viewport-fit=cover lets env(safe-area-inset-*) resolve on notched
