@@ -200,7 +200,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
               <select
                 value={selectedCam}
                 onChange={(e) => setSelectedCam(e.target.value)}
-                className="h-[38px] rounded-[10px] border border-[var(--color-forest-ink)]/10 bg-white px-[10px] text-[13px]"
+                className="h-[44px] rounded-[10px] border border-[var(--color-forest-ink)]/10 bg-white px-[10px] text-[13px]"
               >
                 {devices.cameras.length === 0 && <option value="">No camera</option>}
                 {devices.cameras.map((d) => (
@@ -215,7 +215,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
               <select
                 value={selectedMic}
                 onChange={(e) => setSelectedMic(e.target.value)}
-                className="h-[38px] rounded-[10px] border border-[var(--color-forest-ink)]/10 bg-white px-[10px] text-[13px]"
+                className="h-[44px] rounded-[10px] border border-[var(--color-forest-ink)]/10 bg-white px-[10px] text-[13px]"
               >
                 {devices.mics.length === 0 && <option value="">No mic</option>}
                 {devices.mics.map((d) => (

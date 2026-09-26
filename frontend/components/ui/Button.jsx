@@ -11,9 +11,9 @@ export function Button({
     "inline-flex items-center justify-center font-medium transition-all duration-150 ease-out select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap";
 
   const sizes = {
-    md: "h-[42px] px-[18px] text-[14px] leading-none",
+    md: "h-[44px] px-[18px] text-[14px] leading-none",
     lg: "h-[48px] px-[22px] text-[15px] leading-none",
-    sm: "h-[36px] px-[14px] text-[13px] leading-none",
+    sm: "h-[44px] px-[16px] text-[13px] leading-none",
   };
 
   const variants = {
