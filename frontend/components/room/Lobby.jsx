@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 
 export default function Lobby({ roomName, onJoin, joining }) {
@@ -8,6 +8,10 @@ export default function Lobby({ roomName, onJoin, joining }) {
   const streamRef = useRef(null);
   const [camOn, setCamOn] = useState(true);
   const [micOn, setMicOn] = useState(true);
+  // Mobile browsers (notably Brave) silently deny getUserMedia calls made
+  // without a user gesture, so the preview starts only after one explicit
+  // tap. Every later request (toggles, selects, retry) is gesture-driven.
+  const [previewOn, setPreviewOn] = useState(false);
   const [devices, setDevices] = useState({ cameras: [], mics: [], speakers: [] });
   const [devicesReady, setDevicesReady] = useState(false);
   const [selectedCam, setSelectedCam] = useState("");
@@ -15,33 +19,47 @@ export default function Lobby({ roomName, onJoin, joining }) {
   const [error, setError] = useState("");
   const [hasMic, setHasMic] = useState(false);
 
-  useEffect(() => {
-    async function loadDevices() {
-      try {
-        // request perm to enumerate labels
-        await navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((s) => s.getTracks().forEach((t) => t.stop())).catch(() => {});
-        const devs = await navigator.mediaDevices.enumerateDevices();
-        setDevices({
-          cameras: devs.filter((d) => d.kind === "videoinput"),
-          mics: devs.filter((d) => d.kind === "audioinput"),
-          speakers: devs.filter((d) => d.kind === "audiooutput"),
-        });
-        if (devs.find((d) => d.kind === "videoinput")) setSelectedCam(devs.find((d) => d.kind === "videoinput").deviceId);
-        if (devs.find((d) => d.kind === "audioinput")) setSelectedMic(devs.find((d) => d.kind === "audioinput").deviceId);
-      } catch {
-        setError("Could not list devices — check browser permissions.");
-      } finally {
-        setDevicesReady(true);
-      }
+  const refreshDevices = useCallback(async () => {
+    try {
+      const devs = await navigator.mediaDevices.enumerateDevices();
+      setDevices({
+        cameras: devs.filter((d) => d.kind === "videoinput"),
+        mics: devs.filter((d) => d.kind === "audioinput"),
+        speakers: devs.filter((d) => d.kind === "audiooutput"),
+      });
+      setSelectedCam((prev) => {
+        if (prev) return prev;
+        const first = devs.find((d) => d.kind === "videoinput");
+        return first ? first.deviceId : "";
+      });
+      setSelectedMic((prev) => {
+        if (prev) return prev;
+        const first = devs.find((d) => d.kind === "audioinput");
+        return first ? first.deviceId : "";
+      });
+    } catch {
+      setError("Could not list devices — check browser permissions.");
     }
-    loadDevices();
   }, []);
+
+  // Labels only on mount: no capture without a gesture.
+  useEffect(() => {
+    let cancelled = false;
+    async function init() {
+      await refreshDevices().catch(() => {});
+      if (!cancelled) setDevicesReady(true);
+    }
+    init();
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshDevices]);
 
   // Single live preview stream: cam + mic together, held until device
   // change / toggle / unmount / join. Preview video stays muted (no echo);
   // the mic track runs live so Join inherits workable devices.
   useEffect(() => {
-    if (!devicesReady) return;
+    if (!devicesReady || !previewOn) return;
     let cancelled = false;
     let live = null;
     async function start() {
@@ -67,6 +85,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
         if (videoRef.current) videoRef.current.srcObject = camOn ? live : null;
         setHasMic(!!live.getAudioTracks()[0] && micOn);
         setError("");
+        // permission just granted: re-enumerate so selects show real labels
+        refreshDevices().catch(() => {});
       } catch (e) {
         if (cancelled) return;
         // getUserMedia fails atomically: one blocked device must not kill
@@ -125,7 +145,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
       if (live) live.getTracks().forEach((t) => t.stop());
       if (streamRef.current === live) streamRef.current = null;
     };
-  }, [devicesReady, camOn, micOn, selectedCam, selectedMic]);
+  }, [devicesReady, previewOn, camOn, micOn, selectedCam, selectedMic, refreshDevices]);
 
   return (
     <div className="mx-auto max-w-[980px] w-full grid md:grid-cols-[1.35fr_0.85fr] gap-[18px] animate-slide-up-soft">
@@ -136,7 +156,19 @@ export default function Lobby({ roomName, onJoin, joining }) {
         </div>
         <div className="bg-[var(--color-parchment)] p-[14px]">
           <div className="relative aspect-video rounded-[12px] bg-[var(--color-forest-ink)] overflow-hidden border border-[var(--color-forest-ink)]/20">
-            {camOn ? (
+            {!previewOn ? (
+              <div className="h-full w-full grid place-items-center text-white/70 p-[16px]">
+                <div className="text-center">
+                  <p className="text-[14px] font-medium text-white">Check your devices</p>
+                  <p className="text-[12px] text-white/60 mt-[4px]">One tap enables camera + mic preview — mobile browsers need the tap to allow access.</p>
+                  <div className="mt-[10px]">
+                    <Button variant="filled" size="sm" onClick={() => setPreviewOn(true)}>
+                      Enable camera & mic →
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : camOn ? (
               <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover" />
             ) : (
               <div className="h-full w-full grid place-items-center text-white/70">
@@ -216,9 +248,9 @@ export default function Lobby({ roomName, onJoin, joining }) {
             size="lg"
             className="w-full mt-[14px]"
             onClick={() => onJoin({ camOn, micOn })}
-            disabled={joining || !hasMic || !micOn}
+            disabled={joining || !previewOn || !hasMic || !micOn}
           >
-            {joining ? "Joining…" : hasMic && micOn ? "Join room →" : "Enable mic to join"}
+            {joining ? "Joining…" : !previewOn ? "Enable preview to join" : hasMic && micOn ? "Join room →" : "Enable mic to join"}
           </Button>
           <p className="text-[11px] text-[var(--color-mist)] mt-[8px] text-center">Median join ≤30s · Board updates ≤500ms</p>
         </div>
