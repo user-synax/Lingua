@@ -12,6 +12,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
   // without a user gesture, so the preview starts only after one explicit
   // tap. Every later request (toggles, selects, retry) is gesture-driven.
   const [previewOn, setPreviewOn] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [devices, setDevices] = useState({ cameras: [], mics: [], speakers: [] });
   const [devicesReady, setDevicesReady] = useState(false);
   const [selectedCam, setSelectedCam] = useState("");
@@ -94,6 +95,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
         // audio-only first, then video-only. Stale exact deviceIds (unplugged
         // device) retry once with generic constraints.
         const generic = e?.name === "OverconstrainedError";
+        const name = e?.name || "";
         if (micOn) {
           try {
             live = await navigator.mediaDevices.getUserMedia({
@@ -132,7 +134,15 @@ export default function Lobby({ roomName, onJoin, joining }) {
         }
         if (videoRef.current && !streamRef.current) videoRef.current.srcObject = null;
         if (micOn) {
-          setError("Microphone required — allow mic access. Camera is optional.");
+          if (name === "NotAllowedError" || name === "SecurityError") {
+            setError("Mic blocked — allow the microphone in this site's browser settings (Brave: Shields → device recognition allowed), then Retry.");
+          } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+            setError("No microphone found — plug one in, then Retry.");
+          } else if (name === "NotReadableError" || name === "AbortError") {
+            setError("Mic is busy — close other apps or tabs using it, then Retry.");
+          } else {
+            setError("Microphone required — allow mic access. Camera is optional.");
+          }
           setHasMic(false);
         } else if (camOn && !streamRef.current) {
           setError("Camera blocked — allow access or turn camera off (optional).");
@@ -145,7 +155,7 @@ export default function Lobby({ roomName, onJoin, joining }) {
       if (live) live.getTracks().forEach((t) => t.stop());
       if (streamRef.current === live) streamRef.current = null;
     };
-  }, [devicesReady, previewOn, camOn, micOn, selectedCam, selectedMic, refreshDevices]);
+  }, [devicesReady, previewOn, attempt, camOn, micOn, selectedCam, selectedMic, refreshDevices]);
 
   return (
     <div className="mx-auto max-w-[980px] w-full grid md:grid-cols-[1.35fr_0.85fr] gap-[18px] animate-slide-up-soft">
@@ -225,7 +235,16 @@ export default function Lobby({ roomName, onJoin, joining }) {
               {micOn ? "Mic on" : "Mic off"}
             </Button>
           </div>
-          {error && <p className="mt-[10px] rounded-[10px] bg-amber-50 border border-amber-200 px-[10px] py-[8px] text-[12px] text-amber-800">{error}</p>}
+          {error && (
+            <div className="mt-[10px] rounded-[10px] bg-amber-50 border border-amber-200 px-[10px] py-[8px]">
+              <p className="text-[12px] text-amber-800">{error}</p>
+              {previewOn && (
+                <Button variant="outlined" size="sm" className="mt-[8px]" onClick={() => { setError(""); setAttempt((a) => a + 1); }}>
+                  Retry mic →
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
