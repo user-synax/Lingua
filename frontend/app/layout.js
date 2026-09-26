@@ -15,6 +15,13 @@ export const metadata = {
     "A serious language-learning platform where a realistic AI teacher runs scheduled live classes in a video room, with a shared board and doubts answered on the spot.",
 };
 
+// viewport-fit=cover lets env(safe-area-inset-*) resolve on notched
+// phones; themeColor keeps the status bar on the parchment canvas.
+export const viewport = {
+  viewportFit: "cover",
+  themeColor: "#f7f6f2",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
