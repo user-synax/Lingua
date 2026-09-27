@@ -1,7 +1,8 @@
 "use client";
 
-import { LiveKitRoom, VideoConference, ControlBar, RoomAudioRenderer } from "@livekit/components-react";
+import { LiveKitRoom, VideoConference, RoomAudioRenderer } from "@livekit/components-react";
 import { Button } from "@/components/ui/Button";
+import LearnerControls from "@/components/room/LearnerControls";
 
 export default function RoomView({ token, url, roomName, onLeave, videoEnabled, audioEnabled }) {
   return (
@@ -25,8 +26,8 @@ export default function RoomView({ token, url, roomName, onLeave, videoEnabled, 
             <VideoConference chatMessageFormatter={() => ""} />
             <RoomAudioRenderer />
           </div>
-          <div className="bg-white border-t border-[var(--color-forest-ink)]/10 px-[8px] py-[6px] flex items-center justify-between">
-            <ControlBar variation="minimal" />
+          <div className="bg-white border-t border-[var(--color-forest-ink)]/10 px-[8px] py-[6px] flex items-center justify-between gap-[8px] flex-wrap">
+            <LearnerControls />
             <Button variant="outlined" size="sm" onClick={() => onLeave?.()}>
               Leave →
             </Button>
