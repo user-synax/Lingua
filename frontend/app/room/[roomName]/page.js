@@ -58,6 +58,19 @@ function RoomInner() {
     router.push("/dashboard");
   }
 
+  // TODO(backend): no tutor agent exists yet, so these are intentionally
+  // stubs. Once it lands, onRequestRepeat should send a LiveKit data-channel
+  // message to the tutor agent (e.g. { kind: "tutor.control", action: "repeat",
+  // room: roomName }) and onRequestSlower the same with action "slower" —
+  // exact shape to be agreed with the backend owner, not invented here.
+  function handleRequestRepeat() {
+    console.info("[room] repeat requested", { roomName });
+  }
+
+  function handleRequestSlower() {
+    console.info("[room] slower requested", { roomName });
+  }
+
   return (
     <div className="min-h-screen bg-[var(--color-parchment)] flex flex-col">
       <header className="sticky top-0 pt-[env(safe-area-inset-top)] z-20 bg-[var(--color-parchment)]/85 backdrop-blur border-b border-[var(--color-forest-ink)]/10">
@@ -83,7 +96,7 @@ function RoomInner() {
             <Lobby roomName={roomName} onJoin={handleJoin} joining={joining} />
           </>
         ) : (
-          <RoomView token={token} url={url} roomName={roomName} onLeave={handleLeave} videoEnabled={media.camOn} audioEnabled={media.micOn} />
+          <RoomView token={token} url={url} roomName={roomName} onLeave={handleLeave} onRequestRepeat={handleRequestRepeat} onRequestSlower={handleRequestSlower} videoEnabled={media.camOn} audioEnabled={media.micOn} />
         )}
       </main>
     </div>
