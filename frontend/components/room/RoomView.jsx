@@ -15,13 +15,12 @@ export default function RoomView({ token, url, roomName, onLeave, onRequestRepea
           audio={audioEnabled}
           onDisconnected={() => onLeave?.()}
           className="flex flex-col"
-          style={{ height: "68vh", minHeight: 420 }}
         >
-          <div className="flex shrink-0 items-center justify-between px-[12px] py-[8px] bg-[var(--color-forest-ink)] text-white">
+          <div className="shrink-0 flex items-center justify-between px-[12px] py-[8px] bg-[var(--color-forest-ink)] text-white">
             <span className="text-[11px] tracking-[0.06em] uppercase text-white/70">Live · {roomName} · Board sync via data channel (stub)</span>
             <span className="rounded-full bg-white text-[var(--color-forest-ink)] px-[8px] py-[4px] text-[11px] font-medium">● LiveKit</span>
           </div>
-          <div className="flex-1 min-h-0 bg-[#0f1f1f] relative">
+          <div className="h-[52vh] min-h-[320px] shrink-0 overflow-hidden bg-[#0f1f1f] relative">
             <VideoConference chatMessageFormatter={() => ""} />
             <RoomAudioRenderer />
           </div>
