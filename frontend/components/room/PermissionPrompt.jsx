@@ -56,11 +56,7 @@ export default function PermissionPrompt({
         aria-modal="true"
         aria-label={copy.title}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-[340px] rounded-[20px] bg-[var(--glass-sheet-bg)] border border-[var(--glass-border)] shadow-[var(--glass-shadow)] p-[20px] text-center animate-scale-in"
-        style={{
-          backdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-        }}
+        className="relative w-full max-w-[340px] rounded-[20px] bg-white border border-[var(--color-forest-ink)]/10 shadow-[var(--shadow-md)] p-[20px] text-center animate-scale-in"
       >
         <p className="text-[11px] tracking-[0.08em] uppercase text-[var(--color-mist)]">
           {kind === "mic" ? "Mic needed" : "Camera optional"}
