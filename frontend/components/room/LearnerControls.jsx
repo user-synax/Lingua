@@ -1,16 +1,27 @@
 "use client";
 
-import { useLocalParticipant } from "@livekit/components-react";
+import { useLocalParticipant, useRoomContext } from "@livekit/components-react";
 import { Button } from "@/components/ui/Button";
 
 // PRD CR-6 learner controls (frontend only, no backend).
 // Must render inside <LiveKitRoom>: mic toggles the learner's LiveKit audio
 // track via useLocalParticipant. State is icon + text, never icon-only.
-export default function LearnerControls({ onRequestRepeat, onRequestSlower }) {
+// Leave disconnects explicitly; the room page then routes to /dashboard,
+// where Recent rooms rejoins the same roomName (same room, fresh token).
+export default function LearnerControls({ onRequestRepeat, onRequestSlower, onLeave }) {
+  const room = useRoomContext();
   const { localParticipant, isMicrophoneEnabled } = useLocalParticipant();
 
   async function handleMicToggle() {
     await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+  }
+
+  async function handleLeave() {
+    try {
+      await room.disconnect();
+    } finally {
+      onLeave?.();
+    }
   }
 
   return (
@@ -47,6 +58,14 @@ export default function LearnerControls({ onRequestRepeat, onRequestSlower }) {
         aria-label="Ask the tutor to speak slower"
       >
         Slower
+      </Button>
+      <Button
+        variant="outlined"
+        size="sm"
+        onClick={handleLeave}
+        aria-label="Leave the room and return to dashboard"
+      >
+        Leave →
       </Button>
     </div>
   );
