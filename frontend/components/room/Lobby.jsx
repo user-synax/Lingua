@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import PermissionPrompt from "@/components/room/PermissionPrompt";
 
 export default function Lobby({ roomName, onJoin, joining }) {
   const videoRef = useRef(null);
@@ -19,6 +20,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
   const [selectedMic, setSelectedMic] = useState("");
   const [error, setError] = useState("");
   const [hasMic, setHasMic] = useState(false);
+  const [blockedKind, setBlockedKind] = useState(null);
+  const [promptOpen, setPromptOpen] = useState(false);
 
   const refreshDevices = useCallback(async () => {
     try {
@@ -86,6 +89,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
         if (videoRef.current) videoRef.current.srcObject = camOn ? live : null;
         setHasMic(!!live.getAudioTracks()[0] && micOn);
         setError("");
+        setBlockedKind(null);
+        setPromptOpen(false);
         // permission just granted: re-enumerate so selects show real labels
         refreshDevices().catch(() => {});
       } catch (e) {
@@ -110,6 +115,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
             if (videoRef.current) videoRef.current.srcObject = null;
             setHasMic(true);
             setError(camOn ? "Camera blocked — allow access or turn camera off (optional). Mic stays live." : "");
+            setBlockedKind(camOn ? "camera" : null);
+            setPromptOpen(!!camOn);
             return;
           } catch {
             if (cancelled) return;
@@ -136,6 +143,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
         if (micOn) {
           if (name === "NotAllowedError" || name === "SecurityError") {
             setError("Mic blocked — allow the microphone in this site's browser settings (Brave: Shields → device recognition allowed), then Retry.");
+            setBlockedKind("mic");
+            setPromptOpen(true);
           } else if (name === "NotFoundError" || name === "OverconstrainedError") {
             setError("No microphone found — plug one in, then Retry.");
           } else if (name === "NotReadableError" || name === "AbortError") {
@@ -146,6 +155,8 @@ export default function Lobby({ roomName, onJoin, joining }) {
           setHasMic(false);
         } else if (camOn && !streamRef.current) {
           setError("Camera blocked — allow access or turn camera off (optional).");
+          setBlockedKind("camera");
+          setPromptOpen(true);
         }
       }
     }
@@ -156,6 +167,22 @@ export default function Lobby({ roomName, onJoin, joining }) {
       if (streamRef.current === live) streamRef.current = null;
     };
   }, [devicesReady, previewOn, attempt, camOn, micOn, selectedCam, selectedMic, refreshDevices]);
+
+  function handlePromptAllow() {
+    setError("");
+    setPromptOpen(false);
+    setAttempt((a) => a + 1);
+  }
+
+  function handlePromptDismiss() {
+    setPromptOpen(false);
+  }
+
+  function handleContinueWithoutCamera() {
+    setCamOn(false);
+    setBlockedKind(null);
+    setPromptOpen(false);
+  }
 
   return (
     <div className="mx-auto max-w-[980px] w-full grid md:grid-cols-[1.35fr_0.85fr] gap-[18px] animate-slide-up-soft">
@@ -278,6 +305,13 @@ export default function Lobby({ roomName, onJoin, joining }) {
           <p className="text-[11px] text-[var(--color-lichen-gray)] mt-[4px]">Recording is optional for review. You’ll be asked after join; deletion within 24h. No voiceprints.</p>
         </div>
       </div>
+      <PermissionPrompt
+        open={promptOpen && !!blockedKind}
+        type={blockedKind || "mic"}
+        onAllow={handlePromptAllow}
+        onDismiss={handlePromptDismiss}
+        onContinueWithoutCamera={handleContinueWithoutCamera}
+      />
     </div>
   );
 }
